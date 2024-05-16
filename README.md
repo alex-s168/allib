@@ -1,16 +1,32 @@
-# Kollektions & Kallok
-Collection and memory allocator framework written in C.
-Tested on Linux and Windows.
+# Minilibs & Kollektions & Kallok & Smallstr
+Really useful C libraries, some of which are header-only.
 
-## Features (Kollektions)
+(Tested on Linux and Windows)
+
+To build these libraries, you need to first compile the independent `build.c` file.
+(The project uses [Build.C](https://github.com/alex-s168/build.c))
+But first you should configure some options that can be found in the top of the `build.c` file.
+Then run: `./build.exe list` to list all available tasks.
+(The output static-libraries will be located in the `build/` directory)
+
+You can use TCC to compile on Windows. Define `AR` to `tcc -ar` to do that.
+Example: `tcc -DAR="\"tcc -ar\"" build.c -o build.exe`
+
+Some components might use preprocessor macros like `__AVX512BW__` to compile a different set of source files,
+so make sure to always compile build.c for the correct target.
+it is recommended to copy the CFLAGS you use for building build.c into the CC_ARGS macro.
+
+## Kollektions
 - Fixed List:
   fixed-length mutable list. Is the base for most other collections.
 - Dynamic List:
   dynamically-allocated mutable list.
 - Doubly Linked List:
   dynamically-allocated mutable list with O(1) remove, add and insert
+- Any List
+  virtual interface for all lists
 
-## Features (Kallok)
+## Kallok
 - Common interface for all allocators. `Ally` type.
 - Page allocator
 - LibC allocator
@@ -19,15 +35,8 @@ Tested on Linux and Windows.
 - Disk-based allocator:
   virtual maps a file into memory.
 
-## Building
-This repository currently contains two libraries: `kallok` and `kollektions`.
-To build them, you need to first compile the independent `build.c` file.
-(The project uses [Build.C](https://github.com/alex-s168/build.c))
-But first you should configure some options that can be found in the top of the `build.c` file.
-Then run: `./build.exe kallok.a` and `./build.exe kollektions.a`. The output static-libraries will be located in the `build/` directory.
-It is also recommended to run `./build.exe tests` afterwards.
-# minilibs
-A set of simple, multiplatform, header-only libraries for C.
+## Kash
+- fnv1a
 
 ## miniproc
 Simple child process pipe IO library for C.
@@ -112,7 +121,6 @@ status bar:
         has not hint:
             format: "{message}
 ```
-=======
 
 ## minifmt
 Simple string templating library for C.
@@ -150,3 +158,6 @@ int main(void) {
 ### Additional features
 - `ll_to_ascii`
 - `d_to_ascii`
+
+## smallstr
+Fast vectorized string library compatible with C strings.
