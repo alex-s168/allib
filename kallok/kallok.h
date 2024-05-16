@@ -24,6 +24,7 @@ static size_t makeMultiple(size_t x, size_t y) {
 }
 
 typedef struct {
+    // DOES NOT CRASH IF ALLOC NOT ALLOCATED BY ALLOCATOR
     void (*free)(void *state, void *alloc, size_t old);
 
     void *(*alloc)(void *state, size_t size);
@@ -86,11 +87,21 @@ INTERNAL
 Ally createFixedBasicAlloc(AllyFixedBasicState *state, void *data, size_t limit);
 bool isFixedBasicAllocEmpty(Ally);
 
+typedef struct {
+INTERNAL
+    Ally a;
+    Ally b;
+} AllyMultiState;
+
+// allloctor that tries to alloc a first and if fail, alloc b
+Ally createMultiAlloc(AllyMultiState *state, Ally a, Ally b);
+
 // Allocates full OS pages
 // useful for big lists
 Ally getPageAlloc();
 
 typedef struct {
+INTERNAL
     AllyFixedBasicState fixed_state;
     Ally fixed;
     struct Page page;

@@ -29,6 +29,8 @@ bool isFixedBasicAllocEmpty(Ally ally) {
 static void  alloc_fixed_basic_free(void *stateIn, void *alloc, size_t old) {
     (void) old;
     AllyFixedBasicState *state = stateIn;
+    if (alloc < state->start || alloc > state->start + state->len)
+        return;
     struct Chunk *chunk = alloc - offsetof(struct Chunk, data);
     for (size_t i = 0; i < chunk->chunksUsed; i ++) {
         struct Chunk *op = &chunk[i];

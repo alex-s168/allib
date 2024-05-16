@@ -5,9 +5,10 @@
 #include "kallok.h"
 
 static void alloc_free(void *stateIn, void *alloc, size_t old) {
-    (void) alloc;
     (void) old;
     AllySingleFixedState *state = stateIn;
+    if (alloc != state->start)
+        return;
     state->used = false;
 }
 
