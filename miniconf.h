@@ -1,4 +1,4 @@
-// Define MINICONF_IMPL and FILELIB_IMPL in a seperate C file and include this header
+// Define MINICONF_IMPL in a seperate C file and include this header
 
 /*
 Copyright 2024 Alexander Nutz
@@ -13,32 +13,33 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 #ifndef MINICONF_H
 #define MINICONF_H
 
-#include "filelib.h"
-#include "memlib.h"
-
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "kallok/kallok.h"
+
 typedef struct {
+    Ally ally;
     const char **lines;
     size_t       lines_len;
 } Config;
 
-static void config_init(Config *config) {
+static void config_init(Config *config, Ally ally) {
     config->lines = NULL;
     config->lines_len = 0;
+    config->ally = ally;
 }
 
 static void config_destroy(Config *config) {
-    free(config->lines);
+    yfree(config->ally, config->lines, sizeof(const char *) * config->lines_len);
     config->lines = NULL;
     config->lines_len = 0;
 }
 
 static void config_add_line(Config *dest, const char *line) {
-    dest->lines = realloc(dest->lines, (dest->lines_len + 1) * sizeof (char *));
+    dest->lines = (const char **) yrealloc(dest->ally, dest->lines, dest->lines_len * sizeof (char *), (dest->lines_len + 1) * sizeof (char *));
     dest->lines[dest->lines_len ++] = line;
 }
 
@@ -57,19 +58,6 @@ static void config_add_all_lines(Config *dest, const Config src) {
     if (src.lines_len == 0)
         return;
     config_add_all_lines_adv(dest, src, 0, src.lines_len - 1, 0);
-}
-
-static AllocGroup config_add_file(Config *dest, FILE *file) {
-    AllocGroup alloc;
-    allocgroup_init(&alloc);
-
-    char *line;
-    while ((line = readLine(file)) != NULL) {
-        config_add_line(dest, line);
-        allocgroup_add(&alloc, line);
-    }
-
-    return alloc;
 }
 
 void config_child(Config *dest,
@@ -132,11 +120,11 @@ void config_children(Config *dest,
 #else
 {
     const size_t len = strlen(path_in);
-    char *path = malloc(len + 1);
+    char *path = yalloc(cfg.ally, len + 1);
     memcpy(path, path_in, len + 1);
 
     Config res;
-    config_init(&res);
+    config_init(&res, cfg.ally);
     config_add_all_lines(&res, cfg);
 
     for (size_t i = 0; i < len; i ++)
@@ -155,7 +143,7 @@ void config_children(Config *dest,
         // process path segment
 
         Config found;
-        config_init(&found);
+        config_init(&found, cfg.ally);
 
         bool is_found_x;
         config_child(&found, res, segment, &is_found_x);
@@ -175,7 +163,7 @@ void config_children(Config *dest,
 defer:
     config_destroy(&res);
 
-    free(path);
+    yfree(cfg.ally, path, len + 1);
 }
 #endif
 
@@ -272,7 +260,7 @@ long config_get_long(const Config cfg, bool *ok)
 
 static long config_get_long_at(const Config cfg, const char *path, bool *ok) {
     Config select;
-    config_init(&select);
+    config_init(&select, cfg.ally);
     config_children(&select, cfg, path, ok);
     if (!*ok)
         return 0L;
@@ -301,7 +289,7 @@ double config_get_double(const Config cfg, bool *ok)
 
 static double config_get_double_at(const Config cfg, const char *path, bool *ok) {
     Config select;
-    config_init(&select);
+    config_init(&select, cfg.ally);
     config_children(&select, cfg, path, ok);
     if (!*ok)
         return 0.0;
@@ -333,7 +321,7 @@ bool config_get_bool(const Config cfg, bool *ok)
 
 static bool config_get_bool_at(const Config cfg, const char *path, bool *ok) {
     Config select;
-    config_init(&select);
+    config_init(&select, cfg.ally);
     config_children(&select, cfg, path, ok);
     if (!*ok)
         return false;
@@ -359,7 +347,7 @@ const char *config_get_str(const Config cfg, bool *ok)
 
 static const char *config_get_str_at(const Config cfg, const char *path, bool *ok) {
     Config select;
-    config_init(&select);
+    config_init(&select, cfg.ally);
     config_children(&select, cfg, path, ok);
     if (!*ok)
         return NULL;

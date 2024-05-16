@@ -126,7 +126,6 @@ status bar:
 Simple string templating library for C.
 
 ### Dependencies
-- stdlib.h: malloc, free, realloc
 - math.h: pow
 
 ### Example
