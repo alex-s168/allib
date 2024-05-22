@@ -1,11 +1,11 @@
 #include "niglob.h"
 
-#include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
 
+#define MINIRENT_IMPLEMENTATION
 #include "../minirent.h"
 
 #ifdef _WIN32
@@ -224,6 +224,17 @@ void curlyexp_free(curlyexp_res res) {
 // example:
 //  ~/abc/{cpu,gpu}{.h,.c}  can yield: /home/alex/abc/cpu.h  /home/alex/abc/cpu.c   /home/alex/abc/gpu.h  /home/alex/abc/gpu.c 
 
+#ifdef _WIN32 
+static char * strchrnul(char * ptr, char search) {
+    while (*ptr != '\0') {
+        if (*ptr == search)
+            break;
+        ptr ++;
+    }
+    return ptr;
+}
+#endif 
+
 static void skip_slashes(char * * segment) {
     *segment = strchrnul(*segment, '/');
     while (**segment == '/')
@@ -317,7 +328,7 @@ static void niglob_int(niglob_res * res, const char * pattern, const char * work
         if (username_len == 0) {
 #ifdef _WIN32
             username_len = 255;
-            if (GetUserNameA(username, &username_len) == 0) {
+            if (GetUserName(username, &username_len) == 0) {
                 username_len = 0;
             }
 #else
