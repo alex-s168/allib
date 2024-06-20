@@ -22,7 +22,7 @@ int opstr_countstart(opstr str, opstr other) {
     return other.len;
 }
 
-static inline bool opstr_startswith(opstr str, opstr other) {
+bool opstr_startswith(opstr str, opstr other) {
     return opstr_countstart(str, other) == other.len;
 }
 
@@ -47,7 +47,7 @@ int opstr_countend(opstr str, opstr other) {
     return res;
 }
 
-static inline bool opstr_endswith(opstr str, opstr other) {
+bool opstr_endswith(opstr str, opstr other) {
     return opstr_countend(str, other) == other.len;
 }
 

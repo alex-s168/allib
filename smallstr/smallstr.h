@@ -37,6 +37,7 @@ int opstr_trailing(opstr str, char c);
 int opstr_leadingany(opstr str, const char *some); 
 int opstr_trailingany(opstr str, const char *some);
 
+#ifdef _WIN32 
 static size_t strnlen(const char *s, size_t maxlen) {
 	size_t len;
 	for (len = 0; len < maxlen; len ++, s++)
@@ -44,6 +45,7 @@ static size_t strnlen(const char *s, size_t maxlen) {
             break;
 	return len;
 }
+#endif
 
 static inline smallstr smallstr_from_trunc(const char *c) {
     size_t take = strnlen(c, 64);

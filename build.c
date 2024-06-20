@@ -44,19 +44,15 @@ enum CompileResult target_kash() {
 /* ========================================================================= */
 
 enum CompileResult target_smallstr() {
+    static struct CompileData files[] = {
+        DIR("build/"),
+        DIR("build/smallstr/"),
 #ifdef __AVX512BW__
-    static struct CompileData files[] = {
-        DIR("build/"),
-        DIR("build/smallstr/"),
         SP(CT_C, "smallstr/smallstr_avx512.c"),
-    };
 #else
-    static struct CompileData files[] = {
-        DIR("build/"),
-        DIR("build/smallstr/"),
         SP(CT_C, "smallstr/smallstr_novec.c"),
-    };
 #endif 
+    };
     
     START;
     DO(compile(LI(files)));
@@ -162,8 +158,7 @@ enum CompileResult target_tests() {
     size_t id = 0;
     struct dirent *dp = NULL;
     while ((dp = readdir(dir))) {
-        if (id < 2) { // . and ..
-            id ++;
+        if (!strcmp(dp->d_name, ".") || !strcmp(dp->d_name, "..")) {
             continue;
         }
 
@@ -186,7 +181,7 @@ enum CompileResult target_tests() {
             DEP("build/smallstr.a"),
         };
 
-        resTemp = test_impl(outfile, id - 1, LI(data));
+        resTemp = test_impl(outfile, id + 1, LI(data));
         if (resTemp != CR_OK) res = resTemp;
     
         id ++;
