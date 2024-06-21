@@ -58,17 +58,47 @@ void* DynamicList_setp(struct DynamicList *list, size_t pos)
 
 /**
  * @param list Self
+ * @param data The pointer to the element
+ * @return 0 if ok
+ */
+int DynamicList_set(struct DynamicList *list, size_t pos, void *data) {
+    void *dest = DynamicList_setp(list, pos);
+    if (dest == NULL) {
+        return 1;
+    }
+
+    memcpy(dest, data, list->fixed.stride);
+
+    return 0;
+}
+
+/**
+ * @param list Self
+ * @return non 0 if ok
+ */
+void* DynamicList_addAllp(struct DynamicList *list, size_t len) {
+    if (DynamicList_reserve(list, len))
+        return NULL;
+
+    void *dest = FixedList_get(list->fixed, list->fixed.len);
+
+    list->fixed.len += len;
+
+    return dest;
+}
+
+/**
+ * @param list Self
  * @param data The array of elements
  * @return 0 if ok
  */
 int DynamicList_addAll(struct DynamicList *list, void *data, size_t len) {
-    if (DynamicList_reserve(list, len))
+    void *dest = DynamicList_addAllp(list, len);
+    if (dest == NULL) {
         return 1;
+    }
 
-    void *dest = FixedList_get(list->fixed, list->fixed.len);
     memcpy(dest, data, list->fixed.stride * len);
-
-    list->fixed.len += len;
 
     return 0;
 }

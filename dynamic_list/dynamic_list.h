@@ -55,6 +55,19 @@ void* DynamicList_setp(struct DynamicList *list, size_t pos);
 
 /**
  * @param list Self
+ * @param data The pointer to the element
+ * @return 0 if ok
+ */
+int DynamicList_set(struct DynamicList *list, size_t pos, void *data);
+
+/**
+ * @param list Self
+ * @return non 0 if ok
+ */
+void* DynamicList_addAllp(struct DynamicList *list, size_t len);
+
+/**
+ * @param list Self
  * @param data The array of elements
  * @return 0 if ok
  */
