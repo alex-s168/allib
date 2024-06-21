@@ -37,7 +37,7 @@ int opstr_trailing(opstr str, char c);
 int opstr_leadingany(opstr str, const char *some); 
 int opstr_trailingany(opstr str, const char *some);
 
-#ifdef _WIN32 
+#if defined(_WIN32) && !defined(__MINGW32__)
 static size_t strnlen(const char *s, size_t maxlen) {
 	size_t len;
 	for (len = 0; len < maxlen; len ++, s++)

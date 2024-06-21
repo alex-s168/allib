@@ -43,6 +43,18 @@ int DynamicList_add(struct DynamicList *list, void *data);
 
 /**
  * @param list Self
+ * @return non 0 if ok
+ */
+void* DynamicList_addp(struct DynamicList *list);
+
+/**
+ * @param list Self
+ * @return non 0 if ok
+ */
+void* DynamicList_setp(struct DynamicList *list, size_t pos);
+
+/**
+ * @param list Self
  * @param data The array of elements
  * @return 0 if ok
  */
