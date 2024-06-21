@@ -6,15 +6,17 @@
  * @param data The pointer to the element
  * @return 0 if ok
  */
-int DynamicList_add(struct DynamicList *list, void *data) {
-    if (DynamicList_reserve(list, 1))
-        return 1;
-
-    void *dest = FixedList_get(list->fixed, list->fixed.len);
+int DynamicList_add(struct DynamicList *list, void *data) 
+{
+    void* dest = DynamicList_addp(list);
+	
+	if(!dest)
+	{
+		return 1;
+	}
+	
     memcpy(dest, data, list->fixed.stride);
-
-    list->fixed.len ++;
-
+	
     return 0;
 }
 
