@@ -27,6 +27,8 @@ struct CompileData target_kash_files[] = {
 
     DIR("build/kash/"),
     SP(CT_C, "kash/fnv1a.c"),
+    SP(CT_C, "kash/pearson.c"),
+    SP(CT_C, "kash/sbox.c"),
 };
 
 enum CompileResult target_kash() {
