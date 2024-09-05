@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <string.h>
 
 #define MINICONF_IMPL
@@ -22,8 +21,10 @@ static char conf[] =
 ;
 
 int main() {
+    Ally ally = getLIBCAlloc();
+
     Config cfg;
-    config_init(&cfg);
+    config_init(&cfg, ally);
 
     SPLITERATE(conf, "\n", line) {
         config_add_line(&cfg, line);

@@ -10,9 +10,6 @@
 
 #include "build_c/build.h"
 
-#define MINIRENT_IMPLEMENTATION
-#include "minirent.h"
-
 /* ========================================================================= */
 
 enum CompileResult target_clean() {
@@ -46,19 +43,15 @@ enum CompileResult target_kash() {
 /* ========================================================================= */
 
 enum CompileResult target_smallstr() {
+    static struct CompileData files[] = {
+        DIR("build/"),
+        DIR("build/smallstr/"),
 #ifdef __AVX512BW__
-    static struct CompileData files[] = {
-        DIR("build/"),
-        DIR("build/smallstr/"),
         SP(CT_C, "smallstr/smallstr_avx512.c"),
-    };
 #else
-    static struct CompileData files[] = {
-        DIR("build/"),
-        DIR("build/smallstr/"),
         SP(CT_C, "smallstr/smallstr_novec.c"),
-    };
 #endif 
+    };
     
     START;
     DO(compile(LI(files)));
@@ -155,48 +148,16 @@ enum CompileResult target_kollektions() {
 /* ========================================================================= */
 
 enum CompileResult target_tests() {
-    START_TESTING;
+    static struct CompileData data[] = {
+        DIR("build/"),
+        DIR("build/tests/"),
+        DEP("build/kallok.a"),
+        DEP("build/kollektions.a"),
+        DEP("build/smallstr.a"),
+        LDARG("-lm"),
+    };
 
-    // TODO: add this to build.c
-
-    DIR *dir = opendir("tests/");
-
-    size_t id = 0;
-    struct dirent *dp = NULL;
-    while ((dp = readdir(dir))) {
-        if (id < 2) { // . and ..
-            id ++;
-            continue;
-        }
-
-        static char infile[256];
-        sprintf(infile, "tests/%s", dp->d_name);
-
-        static char outfile[256];
-        sprintf(outfile, "build/tests/%s.exe", dp->d_name);
-
-        static char objfile[256];
-        sprintf(objfile, "build/tests/%s.o", dp->d_name);
-
-        static struct CompileData data[] = {
-            DIR("build/"),
-            DIR("build/tests/"),
-            { .type = CT_C, .srcFile = infile, .outFile = objfile },
-            RUN(outfile),
-            DEP("build/kallok.a"),
-            DEP("build/kollektions.a"),
-            DEP("build/smallstr.a"),
-        };
-
-        resTemp = test_impl(outfile, id - 1, LI(data));
-        if (resTemp != CR_OK) res = resTemp;
-    
-        id ++;
-    }
-
-    (void) closedir(dir);
-
-    END_TESTING;
+    return test_dir("tests", LI(data));
 }
 
 /* ========================================================================= */
