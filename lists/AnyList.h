@@ -16,7 +16,7 @@ typedef struct {
 typedef struct {
     AnyListImpl *impl;
 
-    size_t stride;
+    size_t elSize;
 UNSAFE
     void *self;
 } AnyList;

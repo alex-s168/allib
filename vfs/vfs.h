@@ -104,7 +104,7 @@ VFS VFS_libc(void);
 // takes ownership of the file* and closes it when vfs file dropped
 VFSFile VFSFile_from_libc(FILE* libc);
 
-#include "../alloc/alloc.h"
+#include "../kallok/kallok.h"
 
 VFS VFS_ramfs_create(Ally allocator);
 void VFS_ramfs_destroy(VFS);

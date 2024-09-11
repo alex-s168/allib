@@ -149,7 +149,7 @@ MutAnyList DynamicList_asAny(struct DynamicList *list) {
     immut.self = list;
     immut.impl = &impl;
     immut.stride = list->fixed.stride;
-    
+
     MutAnyList mut;
     mut.any = immut;
     mut.impl = &mutimpl;

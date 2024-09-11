@@ -16,7 +16,7 @@ INTERNAL
     Ally ally;
 };
 
-// THE RETURNED LIST STILL DEPENDS ON THE LIST INPUT!!!
+// THE RETURNED LIST DEPENDS ON THE GIVEN PTR!!!
 MutAnyList DynamicList_asAny(struct DynamicList *list);
 
 /**
