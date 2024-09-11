@@ -1,14 +1,10 @@
-//
-// Created by Alexander Nutz on 21/02/2024.
-//
-
 #include "linked_list.h"
 
 /**
  * @param list Self
  * @param dest The destination list where to add all the elements of this list
  */
-void DoubleLinkedList_flattenInto(struct DoubleLinkedList *list, struct DynamicList *dest) {
+void DoubleLinkedList_flattenInto(DynamicList *dest, const DoubleLinkedList *list) {
     DynamicList_reserve(dest, list->size);
     struct DoubleLinkedElement *elem = list->start;
     while (elem != NULL) {

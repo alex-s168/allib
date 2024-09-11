@@ -1,15 +1,10 @@
-#include "linked_list.h"
+#include "impl.h"
 
 #include <string.h>
 
-static struct DoubleLinkedElement *allocElem(struct DoubleLinkedList *list) {
-    return list->ally.impl->alloc(list->ally.state,
-                                  sizeof(struct DoubleLinkedElement) + list->stride);
-}
-
-void DoubleLinkedList_insertAfter(struct DoubleLinkedList *list, struct DoubleLinkedElement *after, void *data) {
+void DoubleLinkedList_insertAfter(DoubleLinkedList *list, struct DoubleLinkedElement *after, const void *data) {
     struct DoubleLinkedElement *elem = allocElem(list);
-    memcpy(DoubleLinkedElement_data(elem), data, list->stride);
+    memcpy(DoubleLinkedElement_data(elem), data, list->elSize);
 
     elem->prev = after;
     if (after == NULL) {

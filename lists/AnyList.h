@@ -1,5 +1,8 @@
 /* Universal list interface */
 
+#ifndef ANYLIST_H 
+#define ANYLIST_H
+
 #include <stddef.h>
 #include "../attrib.h"
 
@@ -38,3 +41,5 @@ typedef struct {
 
     AnyList any;
 } MutAnyList;
+
+#endif

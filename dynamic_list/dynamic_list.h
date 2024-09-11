@@ -8,16 +8,16 @@
 #include "../kallok/kallok.h"
 #include "../attrib.h"
 
-struct DynamicList {
-    struct FixedList fixed;
+typedef struct {
+    FixedList fixed;
     size_t cap;
 
 INTERNAL
     Ally ally;
-};
+} DynamicList;
 
 // THE RETURNED LIST DEPENDS ON THE GIVEN PTR!!!
-MutAnyList DynamicList_asAny(struct DynamicList *list);
+MutAnyList DynamicList_asAny(DynamicList *list);
 
 /**
  * @param list Self
@@ -26,66 +26,64 @@ MutAnyList DynamicList_asAny(struct DynamicList *list);
  * @param data The array of data. needs to be at least @arg cap * @arg stride
  * @return 0 if ok
  */
-int DynamicList_init(struct DynamicList *list, size_t stride,
-                     Ally ally, size_t initCap);
+int DynamicList_init(DynamicList *list, size_t stride, Ally ally, size_t initCap);
 
 /**
  * @param list Self
  */
-void DynamicList_clear(struct DynamicList *list);
-
-/**
- * @param list Self
- * @param data The pointer to the element
- * @return 0 if ok
- */
-int DynamicList_add(struct DynamicList *list, void *data);
-
-/**
- * @param list Self
- * @return non 0 if ok
- */
-void* DynamicList_addp(struct DynamicList *list);
-
-/**
- * @param list Self
- * @return non 0 if ok
- */
-void* DynamicList_setp(struct DynamicList *list, size_t pos);
+void DynamicList_clear(DynamicList *list);
 
 /**
  * @param list Self
  * @param data The pointer to the element
  * @return 0 if ok
  */
-int DynamicList_set(struct DynamicList *list, size_t pos, void *data);
+int DynamicList_add(DynamicList *list, const void *data);
 
 /**
  * @param list Self
  * @return non 0 if ok
  */
-void* DynamicList_addAllp(struct DynamicList *list, size_t len);
+void* DynamicList_addp(DynamicList *list);
+
+/**
+ * @param list Self
+ * @return non 0 if ok
+ */
+void* DynamicList_setp(DynamicList *list, size_t pos);
+
+/**
+ * @param list Self
+ * @param data The pointer to the element
+ * @return 0 if ok
+ */
+int DynamicList_set(DynamicList *list, size_t pos, const void *data);
+
+/**
+ * @param list Self
+ * @return non 0 if ok
+ */
+void* DynamicList_addAllp(DynamicList *list, size_t len);
 
 /**
  * @param list Self
  * @param data The array of elements
  * @return 0 if ok
  */
-int DynamicList_addAll(struct DynamicList *list, void *data, size_t len);
+int DynamicList_addAll(DynamicList *list, const void *data, size_t len, size_t stride);
 
 /**
  * @param list Self
  * @param pos At which index to remove.
  */
-void DynamicList_removeAt(struct DynamicList *list, size_t pos);
+void DynamicList_removeAt(DynamicList *list, size_t pos);
 
 /**
  * @param list Self
  * @param first The start index where to remove
  * @param last The end index where to remove
  */
-void DynamicList_removeRange(struct DynamicList *list,
-                             size_t first, size_t last);
+void DynamicList_removeRange(DynamicList *list, size_t first, size_t last);
 
 /**
  * @param list Self
@@ -93,8 +91,8 @@ void DynamicList_removeRange(struct DynamicList *list,
  * @param data The element to add
  * @return 0 if ok
  */
-int DynamicList_insertAllAt(struct DynamicList *list, size_t index,
-                            void *data, size_t len);
+int DynamicList_insertAllAt(DynamicList *list, size_t index,
+                            const void *data, size_t len, size_t stride);
 
 /**
  * @param list Self
@@ -102,9 +100,9 @@ int DynamicList_insertAllAt(struct DynamicList *list, size_t index,
  * @param data The element to add
  * @return 0 if ok
  */
-static inline int DynamicList_insertAt(struct DynamicList *list, size_t index,
-                                       void *data) {
-    return DynamicList_insertAllAt(list, index, data, 1);
+static inline int DynamicList_insertAt(DynamicList *list, size_t index,
+                                       const void *data) {
+    return DynamicList_insertAllAt(list, index, data, 1, list->fixed.stride);
 }
 
 /**
@@ -113,7 +111,7 @@ static inline int DynamicList_insertAt(struct DynamicList *list, size_t index,
  * @param additional The amount of additional elements to reserve on top of the length of the list
  * @return 0 if ok
  */
-int DynamicList_reserve(struct DynamicList *list, size_t additional);
+int DynamicList_reserve(DynamicList *list, size_t additional);
 
 /**
  * Reserves space for exactly x additional elements on top of the length of the list
@@ -121,13 +119,16 @@ int DynamicList_reserve(struct DynamicList *list, size_t additional);
  * @param additional The amount of additional elements to reserve on top of the length of the list
  * @return 0 if ok
  */
-int DynamicList_reserveExact(struct DynamicList *list, size_t additional);
+int DynamicList_reserveExact(DynamicList *list, size_t additional);
 
 /**
  * Shrinks the list allocation to be as big as the list.
  * @param list Self
  * @return 0 if ok
  */
-int DynamicList_shrink(struct DynamicList *list);
+int DynamicList_shrink(DynamicList *list);
+
+extern AnyListImpl DynamicList_anyListImpl;
+extern MutAnyListImpl DynamicList_mutAnyListImpl;
 
 #endif //KOLLEKTIONS_DYNAMIC_LIST_H

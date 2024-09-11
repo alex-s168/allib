@@ -1,11 +1,12 @@
 #include "impl_utils.h"
+
 #include <string.h>
 
 /**
  * @param list Self
  * @param pos At which index to remove.
  */
-void DynamicList_removeAt(struct DynamicList *list, size_t pos) {
+void DynamicList_removeAt(DynamicList *list, size_t pos) {
     if (pos != list->fixed.len - 1) {
         // not last element
         void *dest = FixedList_get(list->fixed, pos);
@@ -22,7 +23,7 @@ void DynamicList_removeAt(struct DynamicList *list, size_t pos) {
  * @param first The start index where to remove
  * @param last The end index where to remove
  */
-void DynamicList_removeRange(struct DynamicList *list,
+void DynamicList_removeRange(DynamicList *list,
                              size_t first, size_t last) {
     size_t amToRem = last - first + 1;
     if (last != list->fixed.len - 1) {

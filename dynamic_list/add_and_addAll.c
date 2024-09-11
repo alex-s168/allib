@@ -1,4 +1,5 @@
 #include "impl_utils.h"
+
 #include <string.h>
 
 /**
@@ -6,7 +7,7 @@
  * @param data The pointer to the element
  * @return 0 if ok
  */
-int DynamicList_add(struct DynamicList *list, void *data) 
+int DynamicList_add(DynamicList *list, const void *data) 
 {
     void* dest = DynamicList_addp(list);
 	
@@ -24,7 +25,7 @@ int DynamicList_add(struct DynamicList *list, void *data)
  * @param list Self
  * @return non 0 if ok
  */
-void* DynamicList_addp(struct DynamicList *list)
+void* DynamicList_addp(DynamicList *list)
 {
     if (DynamicList_reserve(list, 1))
         return 0;
@@ -40,7 +41,7 @@ void* DynamicList_addp(struct DynamicList *list)
  * @param list Self
  * @return non 0 if ok
  */
-void* DynamicList_setp(struct DynamicList *list, size_t pos)
+void* DynamicList_setp(DynamicList *list, size_t pos)
 {
 	if(pos > list->fixed.len)
 	{
@@ -61,7 +62,7 @@ void* DynamicList_setp(struct DynamicList *list, size_t pos)
  * @param data The pointer to the element
  * @return 0 if ok
  */
-int DynamicList_set(struct DynamicList *list, size_t pos, void *data) {
+int DynamicList_set(DynamicList *list, size_t pos, const void *data) {
     void *dest = DynamicList_setp(list, pos);
     if (dest == NULL) {
         return 1;
@@ -76,7 +77,7 @@ int DynamicList_set(struct DynamicList *list, size_t pos, void *data) {
  * @param list Self
  * @return non 0 if ok
  */
-void* DynamicList_addAllp(struct DynamicList *list, size_t len) {
+void* DynamicList_addAllp(DynamicList *list, size_t len) {
     if (DynamicList_reserve(list, len))
         return NULL;
 
@@ -92,13 +93,15 @@ void* DynamicList_addAllp(struct DynamicList *list, size_t len) {
  * @param data The array of elements
  * @return 0 if ok
  */
-int DynamicList_addAll(struct DynamicList *list, void *data, size_t len) {
+int DynamicList_addAll(DynamicList *list, const void *data, size_t len, size_t stride) {
     void *dest = DynamicList_addAllp(list, len);
     if (dest == NULL) {
         return 1;
     }
 
-    memcpy(dest, data, list->fixed.stride * len);
+    strided_memcpy(dest, list->fixed.stride,
+                   data, stride,
+                   len, list->fixed.elSize);
 
     return 0;
 }

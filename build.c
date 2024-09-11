@@ -99,17 +99,15 @@ struct CompileData target_kollektions_files[] = {
     SP(CT_C, "dynamic_list/insertAt_and_insertAllAt.c"),
     SP(CT_C, "dynamic_list/removeAt_and_removeRange.c"),
     SP(CT_C, "dynamic_list/reserve_and_shrink.c"),
+    SP(CT_C, "dynamic_list/anylist_impl.c"),
 
     DIR("build/fixed_list/"),
     SP(CT_C, "fixed_list/get_and_set.c"),
     SP(CT_C, "fixed_list/indexOf.c"),
+    SP(CT_C, "fixed_list/anylist_impl.c"),
 
     DIR("build/lists/"),
     SP(CT_C, "lists/copy.c"),
-
-    DIR("build/blocking_list/"),
-    SP(CT_C, "blocking_list/access.c"),
-    SP(CT_C, "blocking_list/init_and_destroy.c"),
 
     DIR("build/linked_list/"),
     SP(CT_C, "linked_list/add.c"),
@@ -124,13 +122,13 @@ struct CompileData target_kollektions_files[] = {
     SP(CT_C, "linked_list/remove.c"),
     SP(CT_C, "linked_list/removeMultiple.c"),
     SP(CT_C, "linked_list/insert.c"),
+    SP(CT_C, "linked_list/anylist_impl.c"),
 };
 
 enum CompileResult target_kollektions() {
     ONLY_IF({
         NOT_FILE("build/kollektions.a");
         CHANGED("linked_list/");
-        CHANGED("blocking_list/");
         CHANGED("lists/");
         CHANGED("dynamic_list/");
         CHANGED("fixed_list/");

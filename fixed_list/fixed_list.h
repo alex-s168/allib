@@ -53,4 +53,6 @@ static inline void *FixedList_get(FixedList list, size_t index) {
  */
 void FixedList_set(FixedList list, size_t index, const void *data);
 
+extern AnyListImpl FixedList_anyListImpl;
+
 #endif //KOLLEKTIONS_FIXED_LIST_H

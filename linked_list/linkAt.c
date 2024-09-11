@@ -1,10 +1,6 @@
-//
-// Created by Alexander Nutz on 21/02/2024.
-//
-
 #include "linked_list.h"
 
-struct DoubleLinkedElement *DoubleLinkedList_linkAt(struct DoubleLinkedList *list, size_t index) {
+struct DoubleLinkedElement *DoubleLinkedList_linkAt(const DoubleLinkedList *list, size_t index) {
     if (index >= list->size)
         return NULL;
 

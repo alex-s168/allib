@@ -41,7 +41,7 @@ int FixedList_indexOf(FixedList list, const void *data) {
     void *curr = list.data;
     int currIndex = 0;
     while (currIndex < list.len) {
-        if (memcmp(curr, data, list.stride) == 0) {
+        if (memcmp(curr, data, list.elSize) == 0) {
             return currIndex;
         }
 
@@ -74,7 +74,7 @@ int FixedList_indexOfLast(FixedList list, const void *data) {
     while (i --> 0) {
         void *curr = list.data + list.stride * i;
 
-        if (memcmp(curr, data, list.stride) == 0) {
+        if (memcmp(curr, data, list.elSize) == 0) {
             return i;
         }
     }

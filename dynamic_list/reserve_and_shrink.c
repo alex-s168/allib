@@ -6,7 +6,7 @@
  * @param additional The amount of additional elements to reserve on top of the length of the list
  * @return 0 if ok
  */
-int DynamicList_reserve(struct DynamicList *list, size_t additional) {
+int DynamicList_reserve(DynamicList *list, size_t additional) {
     size_t new = list->fixed.len + additional;
 
     if (new <= list->cap)
@@ -29,7 +29,7 @@ int DynamicList_reserve(struct DynamicList *list, size_t additional) {
  * @param additional The amount of additional elements to reserve on top of the length of the list
  * @return 0 if ok
  */
-int DynamicList_reserveExact(struct DynamicList *list, size_t additional) {
+int DynamicList_reserveExact(DynamicList *list, size_t additional) {
     size_t new = list->fixed.len + additional;
 
     if (new <= list->cap)
@@ -49,7 +49,7 @@ int DynamicList_reserveExact(struct DynamicList *list, size_t additional) {
  * @param list Self
  * @return 0 if ok
  */
-int DynamicList_shrink(struct DynamicList *list) {
+int DynamicList_shrink(DynamicList *list) {
     if (list->cap == list->fixed.len)
         return 0;
 

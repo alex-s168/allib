@@ -1,19 +1,10 @@
-//
-// Created by Alexander Nutz on 21/02/2024.
-//
-
-#include "linked_list.h"
+#include "impl.h"
 
 #include <string.h>
 
-static struct DoubleLinkedElement *allocElem(struct DoubleLinkedList *list) {
-    return list->ally.impl->alloc(list->ally.state,
-                                  sizeof(struct DoubleLinkedElement) + list->stride);
-}
-
-void DoubleLinkedList_fromLinks(struct DoubleLinkedList *list, const struct DoubleLinkedElement *first, const struct DoubleLinkedElement *last, size_t stride, Ally ally) {
+void DoubleLinkedList_copyFromLinks(DoubleLinkedList *list, const struct DoubleLinkedElement *first, const struct DoubleLinkedElement *last, size_t elSize, Ally ally) {
     list->ally = ally;
-    list->stride = stride;
+    list->elSize = elSize;
     if (first == NULL || last == NULL) {
         list->start = NULL;
         list->end = NULL;
@@ -24,7 +15,7 @@ void DoubleLinkedList_fromLinks(struct DoubleLinkedList *list, const struct Doub
     size_t i = 0;
     while (1) {
         struct DoubleLinkedElement *curr = allocElem(list);
-        memcpy(curr, first, sizeof(struct DoubleLinkedElement) + list->stride);
+        memcpy(curr, first, sizeof(struct DoubleLinkedElement) + list->elSize);
         if (first->next == NULL)
             break;
         first = first->next;

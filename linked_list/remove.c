@@ -1,10 +1,6 @@
-//
-// Created by Alexander Nutz on 21/02/2024.
-//
+#include "impl.h"
 
-#include "linked_list.h"
-
-void DoubleLinkedList_remove(struct DoubleLinkedList *list, struct DoubleLinkedElement *element) {
+void DoubleLinkedList_remove(DoubleLinkedList *list, struct DoubleLinkedElement *element) {
     if (element->prev == NULL) {
         // first element in list
         list->start = element->next;
@@ -21,6 +17,6 @@ void DoubleLinkedList_remove(struct DoubleLinkedList *list, struct DoubleLinkedE
         element->next->prev = element->prev;
     }
 
-    list->ally.impl->free(list->ally.state, element, sizeof(struct DoubleLinkedElement) + list->stride);
+    freeElem(list, element);
     list->size --;
 }

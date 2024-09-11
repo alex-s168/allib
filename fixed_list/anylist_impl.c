@@ -15,7 +15,7 @@ static long long int anyfind(void* self, const void* cmp) {
     return FixedList_indexOf(*li, cmp);
 }
 
-static AnyListImpl impl = (AnyListImpl) {
+AnyListImpl FixedList_anyListImpl = (AnyListImpl) {
     .get = anyget,
     .len = anylen, 
     .find = anyfind,
@@ -26,6 +26,6 @@ AnyList FixedList_asAny(const FixedList * list) {
     return (AnyList) {
         .elSize = list->elSize,
         .self = (void*) list,
-        .impl = &impl, 
+        .impl = &FixedList_anyListImpl, 
     };
 }

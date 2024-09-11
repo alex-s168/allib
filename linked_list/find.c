@@ -1,17 +1,13 @@
-//
-// Created by Alexander Nutz on 21/02/2024.
-//
-
 #include "linked_list.h"
 
 #include <string.h>
 
-struct DoubleLinkedFindResult DoubleLinkedList_find(struct DoubleLinkedList *list, void *element) {
+struct DoubleLinkedFindResult DoubleLinkedList_find(const DoubleLinkedList *list, const void *element) {
     size_t index = 0;
     struct DoubleLinkedElement *elem = list->start;
     while (elem != NULL) {
         void *data = DoubleLinkedElement_data(elem);
-        if (memcmp(data, element, list->stride) == 0) {
+        if (memcmp(data, element, list->elSize) == 0) {
             return (struct DoubleLinkedFindResult) {
                 .index = index,
                 .data = data,

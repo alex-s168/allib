@@ -1,17 +1,10 @@
-//
-// Created by Alexander Nutz on 21/02/2024.
-//
+#include "impl.h"
 
-#include "linked_list.h"
-
-/**
- * @param list Self
- */
-void DoubleLinkedList_clear(struct DoubleLinkedList *list) {
+void DoubleLinkedList_clear(DoubleLinkedList *list) {
     struct DoubleLinkedElement *elem = list->start;
     while (elem != NULL) {
         struct DoubleLinkedElement *next = elem->next;
-        list->ally.impl->free(list->ally.state, elem, sizeof(struct DoubleLinkedElement) + list->stride);
+        freeElem(list, elem);
         elem = next;
     }
     list->start = NULL;

@@ -12,8 +12,8 @@
  * @param ally The allocator to use
  * @param additionalCap The additional initial capacity of the new list. (initCap = additionalCap + old.len)
  */
-void FixedList_copy(struct FixedList list,
-                    struct DynamicList *dest,
+void FixedList_copy(FixedList list,
+                    DynamicList *dest,
                     Ally ally,
                     size_t additionalCap);
 
@@ -23,8 +23,8 @@ void FixedList_copy(struct FixedList list,
  * @param ally The allocator to use
  * @param additionalCap The additional initial capacity of the new list. (initCap = additionalCap + old.len)
  */
-void DynamicList_copy(struct DynamicList list,
-                      struct DynamicList *dest,
+void DynamicList_copy(DynamicList list,
+                      DynamicList *dest,
                       Ally ally,
                       size_t additionalCap);
 

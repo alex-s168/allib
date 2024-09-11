@@ -1,7 +1,3 @@
-//
-// Created by Alexander Nutz on 17/02/2024.
-//
-
 #ifndef KALLOK_H
 #define KALLOK_H
 
@@ -36,6 +32,10 @@ typedef struct {
     AllyImpl *impl;
     void *state;
 } Ally;
+
+static bool Ally_eq(Ally a, Ally b) {
+    return a.impl == b.impl && a.state == b.state;
+}
 
 #define yalloc(a, size)               a.impl->alloc(a.state, size)
 #define yrealloc(a, alloc, old, size) a.impl->realloc(a.state, alloc, old, size)
