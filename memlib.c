@@ -5,13 +5,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#if __WORDSIZE == 64
-# define MALLOC_ALIGNMENT (16)
-#elif __WORDSIZE == 32
-# define MALLOC_ALIGNMENT (8)
-#else 
-# error wtf
-#endif
+#define MALLOC_ALIGNMENT (8)
 
 static void strided_memcpy_same_stride(char* dest,
                                        const char *src,
@@ -140,7 +134,31 @@ void strided_memcpy(void* dest, size_t dest_stride,
                     size_t numEl,
                     size_t elSize) {
 
-    if (dest_stride == src_stride) {
+    // no overlap
+    if (dest >= src && dest < src + numEl * src_stride) {
+        __builtin_unreachable();
+    }
+
+    if (elSize > dest_stride) {
+        __builtin_unreachable();
+    }
+
+    if (elSize > src_stride) {
+        __builtin_unreachable();
+    }
+
+    if (elSize == 0) {
+        __builtin_unreachable();
+    }
+
+    if (dest_stride - elSize > 512 || src_stride - elSize > 512) { 
+        // other methods are too slow because really sparse data 
+
+        for (size_t i = 0; i < numEl; i ++) {
+            memcpy(&dest[dest_stride * i], &src[src_stride * i], elSize);
+        }
+    }
+    else if (dest_stride == src_stride) {
         if (dest_stride == elSize) {
             memcpy(dest, src, numEl * elSize);
         }
@@ -153,4 +171,5 @@ void strided_memcpy(void* dest, size_t dest_stride,
                                    src, src_stride,
                                    numEl, elSize);
     }
+
 }

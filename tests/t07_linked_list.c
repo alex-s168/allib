@@ -1,6 +1,6 @@
 #include "../linked_list/linked_list.h"
 
-static int* elemAt(struct DoubleLinkedList *list, size_t i) {
+static int* elemAt(DoubleLinkedList *list, size_t i) {
     struct DoubleLinkedElement *elem = DoubleLinkedList_linkAt(list, i);
     if (elem == NULL)
         return NULL;
@@ -11,7 +11,7 @@ static int* elemAt(struct DoubleLinkedList *list, size_t i) {
 #include <stdio.h>
 
 int main() {
-    struct DoubleLinkedList list;
+    DoubleLinkedList list;
     DoubleLinkedList_init(&list, sizeof(int), getLIBCAlloc());
 
     DoubleLinkedList_add(&list, (int[]) { 2 });

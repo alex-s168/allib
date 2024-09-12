@@ -11,7 +11,7 @@ int main() {
     AllySingleFixedState allyState;
     Ally ally = createSingleFixedAlloc(&allyState, alloc, sizeof(alloc));
 
-    struct DynamicList list;
+    DynamicList list;
     DynamicList_init(&list, sizeof(int), ally, 0);
 
     DynamicList_add(&list, &(int) { 1 });

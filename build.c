@@ -26,6 +26,8 @@ struct CompileData target_kash_files[] = {
     SP(CT_C, "kash/fnv1a.c"),
     SP(CT_C, "kash/pearson.c"),
     SP(CT_C, "kash/sbox.c"),
+
+    CCARG("-Wno-shift-count-overflow"),
 };
 
 enum CompileResult target_kash() {
@@ -74,12 +76,15 @@ struct CompileData target_kallok_files[] = {
     SP(CT_C, "kallok/basic.c"),
     SP(CT_C, "kallok/single_fixed.c"),
     SP(CT_C, "kallok/multi.c"),
+    SP(CT_C, "memlib.c"),
 };
 
 enum CompileResult target_kallok() {
     ONLY_IF({
         NOT_FILE("build/kallok.a");
         CHANGED("kallok/");
+        CHANGED("memlib.c");
+        CHANGED("memlib.h");
     });
 
     START;

@@ -3,6 +3,11 @@
 #include <string.h>
 
 void DoubleLinkedList_insertAfter(DoubleLinkedList *list, struct DoubleLinkedElement *after, const void *data) {
+    if (after == NULL) {
+        DoubleLinkedList_addFront(list, data);
+        return;
+    }
+
     struct DoubleLinkedElement *elem = allocElem(list);
     memcpy(DoubleLinkedElement_data(elem), data, list->elSize);
 
