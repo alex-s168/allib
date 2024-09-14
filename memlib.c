@@ -2,15 +2,19 @@
 
 #include <string.h>
 #include <stdbool.h>
-#include <stdlib.h>
 
 #define MALLOC_ALIGNMENT (8)
+#define OPT_STRIDED_MEMCPY_MAX_STRIDE (128) // should be multiple of target vlen
 
 static void strided_memcpy_same_stride(char* dest,
                                        const char *src,
                                        size_t numEl,
                                        size_t elSize, 
                                        size_t stride) {
+
+    if (stride > OPT_STRIDED_MEMCPY_MAX_STRIDE) {
+        __builtin_unreachable();
+    }
 
     // no overlap
     if (dest >= src && dest <= src + numEl * stride) {
@@ -25,106 +29,22 @@ static void strided_memcpy_same_stride(char* dest,
         __builtin_unreachable();
     }
 
-    bool *mask;
-
-    if (stride > 4096) {
-        mask = malloc(stride);
-        if (mask == NULL) return;
-    } else {
-        mask = __builtin_alloca_with_align(stride, MALLOC_ALIGNMENT);
-    }
-
-    mask = __builtin_assume_aligned(mask, MALLOC_ALIGNMENT);
+    bool mask[OPT_STRIDED_MEMCPY_MAX_STRIDE];
 
     {
         size_t i = 0;
         for (; i < elSize; i ++) {
             mask[i] = true;
         }
-        for (; i < stride; i ++) {
+        for (; i < OPT_STRIDED_MEMCPY_MAX_STRIDE; i ++) {
             mask[i] = false;
         }
     }
 
-    for (size_t i = 0; i < numEl * stride; i += stride) {
-        for (size_t j = 0; j < stride; j ++) {
-            if (mask[j]) {
-                dest[i + j] = src[i + j];
-            }
+    for (size_t i = 0; i < numEl * stride; i++) {
+        if (mask[i % OPT_STRIDED_MEMCPY_MAX_STRIDE]) {
+            dest[i] = src[i];
         }
-    }
-
-    if (stride > 4096) {
-        free(mask);
-    }
-}
-
-static void strided_memcpy_diff_stride(char* dest, size_t destStride,
-                                       const char *src, size_t srcStride,
-                                       size_t numEl,
-                                       size_t elSize) {
-
-    // no overlap
-    if (dest >= src && dest < src + numEl * srcStride) {
-        __builtin_unreachable();
-    }
-
-    if (elSize > destStride) {
-        __builtin_unreachable();
-    }
-
-    if (elSize > srcStride) {
-        __builtin_unreachable();
-    }
-
-    if (elSize == 0) {
-        __builtin_unreachable();
-    }
-
-    size_t maxStride = srcStride;
-    if (destStride > maxStride)
-        maxStride = destStride;
-
-    bool * mask;
-    char * tempElem;
-
-    if (maxStride > 4096) {
-        mask = malloc(maxStride);
-        if (mask == NULL) return;
-        tempElem = malloc(maxStride);
-        if (tempElem == NULL) return;
-    } else {
-        mask = __builtin_alloca_with_align(maxStride, MALLOC_ALIGNMENT);
-        tempElem = __builtin_alloca_with_align(maxStride, MALLOC_ALIGNMENT);
-    }
-
-    mask = __builtin_assume_aligned(mask, MALLOC_ALIGNMENT);
-    tempElem = __builtin_assume_aligned(tempElem, MALLOC_ALIGNMENT);
-
-    {
-        size_t i = 0;
-        for (; i < elSize; i ++) {
-            mask[i] = true;
-        }
-        for (; i < maxStride; i ++) {
-            mask[i] = false;
-        }
-    }
-
-    for (size_t elemId = 0; elemId < numEl; elemId ++) {
-        memcpy(tempElem, &src[elemId * srcStride], srcStride);
-
-        size_t destI = elemId * destStride;
-        for (size_t j = 0; j < destStride; j ++) {
-            if (mask[j]) {
-                dest[destI + j]  = tempElem[j];
-            }
-        }
-    }
-
-    if (maxStride > 4096) {
-        free(mask);
-        free(tempElem);
     }
 }
 
@@ -150,7 +70,7 @@ void strided_memcpy(void* dest, size_t dest_stride,
         __builtin_unreachable();
     }
 
-    if (dest_stride - elSize > 512 || src_stride - elSize > 512) { 
+    if (dest_stride - elSize > OPT_STRIDED_MEMCPY_MAX_STRIDE || src_stride - elSize > OPT_STRIDED_MEMCPY_MAX_STRIDE) { 
         // other methods are too slow because really sparse data 
 
         for (size_t i = 0; i < numEl; i ++) {
@@ -166,9 +86,10 @@ void strided_memcpy(void* dest, size_t dest_stride,
         }
     }
     else {
-        strided_memcpy_diff_stride(dest, dest_stride,
-                                   src, src_stride,
-                                   numEl, elSize);
+        // TODO: implement new variant with scatter & gather 
+        for (size_t i = 0; i < numEl; i ++) {
+            memcpy(&dest[dest_stride * i], &src[src_stride * i], elSize);
+        }
     }
 
 }
