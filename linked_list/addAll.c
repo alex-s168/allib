@@ -16,6 +16,9 @@ void DoubleLinkedList_addAllClearOld(DoubleLinkedList *list, DoubleLinkedList *d
         data->start->prev = list->end;
     }
     list->end = data->end;
+    if (list->start == NULL) {
+        data->start = list->start;
+    }
     data->end = NULL;
     data->start = NULL;
     data->size = 0;
@@ -38,6 +41,9 @@ void DoubleLinkedList_addAllFrontClearOld(DoubleLinkedList *list, DoubleLinkedLi
         data->end->next = list->start;
     }
     list->start = data->start;
+    if (list->end == NULL) {
+        list->end = data->end;
+    }
     data->end = NULL;
     data->start = NULL;
     data->size = 0;

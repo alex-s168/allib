@@ -1,4 +1,4 @@
-#include "smallstr.h"
+#include "opstr.h"
 
 int opstr_find(opstr str, char c) {
     for (unsigned char i = 0; i < str.len; i ++)

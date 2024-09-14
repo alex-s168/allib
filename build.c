@@ -1,11 +1,11 @@
 #ifndef CC
-# define CC        "tcc"
+# define CC        "clang"
 #endif
 #ifndef CC_ARGS
-# define CC_ARGS   "-O2"
+# define CC_ARGS   "-O3"
 #endif
 #ifndef CXX_ARGS
-# define CXX_ARGS  "-O2"
+# define CXX_ARGS  "-O3"
 #endif
 
 #include "build_c/build.h"
@@ -15,6 +15,28 @@
 enum CompileResult target_clean() {
     rmdir("build/");
     return CR_OK;
+}
+
+
+/* ========================================================================= */
+
+struct CompileData target_germanstr_files[] = {
+    DIR("build/"),
+
+    DIR("build/germanstr/"),
+    SP(CT_C, "germanstr/germanstr.c"),
+};
+
+enum CompileResult target_germanstr() {
+    ONLY_IF({
+        NOT_FILE("build/germanstr.a");
+        CHANGED("germanstr/");
+    });
+
+    START;
+        DO(compile(LI(target_germanstr_files)));
+        DO(linkTask(LI(target_germanstr_files), "build/germanstr.a"));
+    END;
 }
 
 /* ========================================================================= */
@@ -44,20 +66,20 @@ enum CompileResult target_kash() {
 
 /* ========================================================================= */
 
-enum CompileResult target_smallstr() {
+enum CompileResult target_opstr() {
     static struct CompileData files[] = {
         DIR("build/"),
-        DIR("build/smallstr/"),
+        DIR("build/opstr/"),
 #ifdef __AVX512BW__
-        SP(CT_C, "smallstr/smallstr_avx512.c"),
+        SP(CT_C, "opstr/opstr_avx512.c"),
 #else
-        SP(CT_C, "smallstr/smallstr_novec.c"),
+        SP(CT_C, "opstr/opstr_novec.c"),
 #endif 
     };
     
     START;
     DO(compile(LI(files)));
-    DO(linkTask(LI(files), "build/smallstr.a"));
+    DO(linkTask(LI(files), "build/opstr.a"));
 
     END;
 }
@@ -154,9 +176,12 @@ enum CompileResult target_tests() {
     static struct CompileData data[] = {
         DIR("build/"),
         DIR("build/tests/"),
-        DEP("build/kallok.a"),
+
         DEP("build/kollektions.a"),
-        DEP("build/smallstr.a"),
+        DEP("build/kallok.a"),
+        DEP("build/kash.a"),
+        DEP("build/opstr.a"),
+        DEP("build/germanstr.a"),
         LDARG("-lm"),
     };
 
@@ -169,8 +194,9 @@ struct Target targets[] = {
 	{ .name = "kallok.a",       .run = target_kallok },
 	{ .name = "kollektions.a",  .run = target_kollektions },
     { .name = "kash.a",         .run = target_kash },
-    { .name = "smallstr.a",     .run = target_smallstr },
-	{ .name = "tests",          .run = target_tests },
+    { .name = "opstr.a",        .run = target_opstr },
+    { .name = "germanstr.a",    .run = target_germanstr },
+    { .name = "tests",          .run = target_tests },
     { .name = "clean",          .run = target_clean },
 };
 

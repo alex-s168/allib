@@ -1,7 +1,7 @@
 #include "impl.h"
 
 void DoubleLinkedList_remove(DoubleLinkedList *list, struct DoubleLinkedElement *element) {
-    if (element->prev == NULL) {
+    if (list->start == element) {
         // first element in list
         list->start = element->next;
     } else {
@@ -9,7 +9,7 @@ void DoubleLinkedList_remove(DoubleLinkedList *list, struct DoubleLinkedElement 
         element->prev->next = element->next;
     }
 
-    if (element->next == NULL) {
+    if (list->end == element) {
         // last element in list
         list->end = element->prev;
     } else {

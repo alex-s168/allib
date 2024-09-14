@@ -1,6 +1,6 @@
 #include "../memlib.h"
 
-int main() {
+int main(void) {
     char data1[126];
     for (size_t i = 0; i < 126; i ++) {
         data1[i] = 69;
@@ -16,8 +16,8 @@ int main() {
 
     // interleave 
 
-    strided_memcpy(data1, 3,
-                   data2, 2,
+    strided_memcpy(data1, 2,
+                   data2, 1,
                    63, 1);
 
     for (size_t i = 1; i < 126; i += 2) {

@@ -1,4 +1,4 @@
-#include "smallstr.h"
+#include "opstr.h"
 
 #include <immintrin.h>
 
@@ -6,13 +6,13 @@ static inline __m512i opstr_v_place(opstr str) {
     return _mm512_loadu_si512(*str.str);
 }
 
-static inline unsigned long long opstr_v_eqmask(opstr str, __mm512i maskvec) {
+static inline unsigned long long opstr_v_eqmask(opstr str, __m512i maskvec) {
     __m512i vec = opstr_v_place(str);
     return _mm512_cmpeq_epi8_mask(maskvec, vec);
 }
 
 static inline int opstr_v_index(opstr str, __m512i maskvec) {
-    unsigned long long mask = opstr_v_eqmask(maskvec, str);
+    unsigned long long mask = opstr_v_eqmask(str, maskvec);
 
     if (mask != 0)
         return __builtin_ctzll(mask);
@@ -22,16 +22,16 @@ static inline int opstr_v_index(opstr str, __m512i maskvec) {
 
 int opstr_findzero(opstr str) {
     __m512i mask = _mm512_setzero_epi32();
-    return smallstr_v_index(str, mask);
+    return opstr_v_index(str, mask);
 }
 
 int opstr_find(opstr str, char c) {
     __m512i mask = _mm512_set1_epi8(c);
-    return smallstr_v_index(str, mask);
+    return opstr_v_index(str, mask);
 }
 
 static inline int opstr_v_cleading(opstr str, __m512i b) {
-    unsigned long long mask = opstr_v_eqmask(b, str);
+    unsigned long long mask = opstr_v_eqmask(str, b);
     mask = ~mask;
     if (mask == 0)
         return str.len;
@@ -52,7 +52,7 @@ int opstr_leading(opstr str, char c) {
 }
 
 static inline int opstr_v_ctrailing(opstr str, __m512i b) {
-    unsigned long long mask = opstr_v_eqmask(b, str);
+    unsigned long long mask = opstr_v_eqmask(str, b);
     mask = ~mask;
     if (mask == 0)
         return str.len;

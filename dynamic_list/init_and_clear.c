@@ -16,6 +16,7 @@ int DynamicList_init(DynamicList *list, size_t stride,
         if (alloc == NULL)
             return 1;
     }
+    list->fixed.elSize = stride;
     list->fixed.stride = stride;
     list->fixed.data = alloc;
     list->cap = initCap;
