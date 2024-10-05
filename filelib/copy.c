@@ -12,7 +12,7 @@ void copyFile(FILE *dest, FILE *src, Ally ally)
 size_t copyNFile(FILE *dest, FILE *src, size_t count, Ally ally)
 {
     if (count == 0)
-        return;
+        return 0;
     
     char *buf = yalloc(ally, count);
     if (buf == NULL)
