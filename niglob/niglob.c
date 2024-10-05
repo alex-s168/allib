@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #define MINIRENT_IMPLEMENTATION
 #include "../minirent.h"
