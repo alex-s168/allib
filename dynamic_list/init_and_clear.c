@@ -12,14 +12,16 @@ int DynamicList_init(DynamicList *list, size_t stride,
 
     void *alloc = NULL;
     if (initCap > 0) {
-        alloc = ally.impl->alloc(ally.state, initCap * stride);
+        alloc = yalloc(ally, initCap * stride);
         if (alloc == NULL)
             return 1;
     }
     list->fixed.elSize = stride;
     list->fixed.stride = stride;
     list->fixed.data = alloc;
+#if A_CFG_DYN_LIST_OVERALLOC
     list->cap = initCap;
+#endif
     list->fixed.len = 0;
     list->ally = ally;
 
@@ -27,8 +29,10 @@ int DynamicList_init(DynamicList *list, size_t stride,
 }
 
 void DynamicList_clear(DynamicList *list) {
-    list->ally.impl->free(list->ally.state, list->fixed.data, list->cap);
+    yfree(list->ally, list->fixed.data, list->cap);
+#if A_CFG_DYN_LIST_OVERALLOC
     list->cap = 0;
+#endif
     list->fixed.len = 0;
     list->fixed.data = NULL;
 }

@@ -4,6 +4,8 @@
 
 #include "kallok.h"
 
+#if !A_CFG_ALLY_ONLY_LIBC 
+
 struct State {
     struct AllyStats stats;
     Ally parent;
@@ -48,3 +50,4 @@ void outputStats(struct AllyStats *stats, FILE *dest) {
     fprintf(dest, " %zu de-allocations\n", stats->frees);
     fprintf(dest, " %zu re-allocations\n", stats->reallocs);
 }
+#endif

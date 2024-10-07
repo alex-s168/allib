@@ -10,9 +10,13 @@
 
 typedef struct {
     FixedList fixed;
-    size_t cap;
 
 INTERNAL
+
+#if A_CFG_DYN_LIST_OVERALLOC
+    size_t cap;
+#endif
+
     Ally ally;
 } DynamicList;
 
@@ -111,7 +115,15 @@ static inline int DynamicList_insertAt(DynamicList *list, size_t index,
  * @param additional The amount of additional elements to reserve on top of the length of the list
  * @return 0 if ok
  */
-int DynamicList_reserve(DynamicList *list, size_t additional);
+#if !A_CFG_DYN_LIST_OVERALLOC 
+static 
+#endif
+int DynamicList_reserve(DynamicList *list, size_t additional)
+#if A_CFG_DYN_LIST_OVERALLOC 
+; 
+#else
+{  return 0; }
+#endif
 
 /**
  * Reserves space for exactly x additional elements on top of the length of the list
@@ -119,14 +131,30 @@ int DynamicList_reserve(DynamicList *list, size_t additional);
  * @param additional The amount of additional elements to reserve on top of the length of the list
  * @return 0 if ok
  */
-int DynamicList_reserveExact(DynamicList *list, size_t additional);
+#if !A_CFG_DYN_LIST_OVERALLOC 
+static 
+#endif
+int DynamicList_reserveExact(DynamicList *list, size_t additional)
+#if A_CFG_DYN_LIST_OVERALLOC 
+; 
+#else
+{  return 0; }
+#endif
 
 /**
  * Shrinks the list allocation to be as big as the list.
  * @param list Self
  * @return 0 if ok
  */
-int DynamicList_shrink(DynamicList *list);
+#if !A_CFG_DYN_LIST_OVERALLOC 
+static 
+#endif
+int DynamicList_shrink(DynamicList *list)
+#if A_CFG_DYN_LIST_OVERALLOC 
+; 
+#else
+{  return 0; }
+#endif
 
 extern AnyListImpl DynamicList_anyListImpl;
 extern MutAnyListImpl DynamicList_mutAnyListImpl;

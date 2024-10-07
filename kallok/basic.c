@@ -71,6 +71,7 @@ static AllyImpl impl = {
     .realloc = alloc_realloc,
 };
 
+#if !A_CFG_ALLY_ONLY_LIBC 
 Ally createBasicAlloc(AllyDynamicBasicState *state, bool can_leak) {
     state->paged = getPageAlloc();
     state->entries_len = 0;
@@ -78,3 +79,4 @@ Ally createBasicAlloc(AllyDynamicBasicState *state, bool can_leak) {
     state->can_leak = can_leak;
     return (Ally) { .state = state, .impl = &impl };
 }
+#endif
