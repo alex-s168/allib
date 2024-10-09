@@ -4,6 +4,8 @@
 
 #include "kallok.h"
 
+#if !A_CFG_ALLY_ONLY_LIBC 
+
 #include <stdlib.h>
 
 static void  alloc_libc_free(void *state, void *alloc, size_t old) {
@@ -34,3 +36,5 @@ Ally getLIBCAlloc() {
         .impl = &alloc_libc
     };
 }
+
+#endif

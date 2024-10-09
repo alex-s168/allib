@@ -17,77 +17,25 @@ enum CompileResult target_clean() {
     return CR_OK;
 }
 
-
 /* ========================================================================= */
 
-struct CompileData target_germanstr_files[] = {
+struct CompileData germanstr_files[] = {
     DIR("build/"),
-
     DIR("build/germanstr/"),
     SP(CT_C, "germanstr/germanstr.c"),
 };
 
-enum CompileResult target_germanstr() {
-    ONLY_IF({
-        NOT_FILE("build/germanstr.a");
-        CHANGED("germanstr/");
-    });
-
-    START;
-        DO(compile(LI(target_germanstr_files)));
-        DO(linkTask(LI(target_germanstr_files), "build/germanstr.a"));
-    END;
-}
-
-/* ========================================================================= */
-
-struct CompileData target_kash_files[] = {
+struct CompileData kash_files[] = {
     DIR("build/"),
-
     DIR("build/kash/"),
     SP(CT_C, "kash/fnv1a.c"),
     SP(CT_C, "kash/pearson.c"),
     SP(CT_C, "kash/sbox.c"),
-
     CCARG("-Wno-shift-count-overflow"),
 };
 
-enum CompileResult target_kash() {
-    ONLY_IF({
-        NOT_FILE("build/kash.a");
-        CHANGED("kash/");
-    });
-
-    START;
-        DO(compile(LI(target_kash_files)));
-        DO(linkTask(LI(target_kash_files), "build/kash.a"));
-    END;
-}
-
-/* ========================================================================= */
-
-enum CompileResult target_opstr() {
-    static struct CompileData files[] = {
-        DIR("build/"),
-        DIR("build/opstr/"),
-#ifdef __AVX512BW__
-        SP(CT_C, "opstr/opstr_avx512.c"),
-#else
-        SP(CT_C, "opstr/opstr_novec.c"),
-#endif 
-    };
-    
-    START;
-    DO(compile(LI(files)));
-    DO(linkTask(LI(files), "build/opstr.a"));
-
-    END;
-}
-/* ========================================================================= */
-
-struct CompileData target_kallok_files[] = {
+struct CompileData kallok_files[] = {
     DIR("build/"),
-
     DIR("build/kallok/"),
     SP(CT_C, "kallok/libc.c"),
     SP(CT_C, "kallok/statistic.c"),
@@ -98,28 +46,10 @@ struct CompileData target_kallok_files[] = {
     SP(CT_C, "kallok/basic.c"),
     SP(CT_C, "kallok/single_fixed.c"),
     SP(CT_C, "kallok/multi.c"),
-    SP(CT_C, "memlib.c"),
 };
 
-enum CompileResult target_kallok() {
-    ONLY_IF({
-        NOT_FILE("build/kallok.a");
-        CHANGED("kallok/");
-        CHANGED("memlib.c");
-        CHANGED("memlib.h");
-    });
-
-    START;
-        DO(compile(LI(target_kallok_files)));
-        DO(linkTask(LI(target_kallok_files), "build/kallok.a"));
-    END;
-}
-
-/* ========================================================================= */
-
-struct CompileData target_kollektions_files[] = {
+struct CompileData dynamic_list_files[] = {
     DIR("build/"),
-
     DIR("build/dynamic_list/"),
     SP(CT_C, "dynamic_list/add_and_addAll.c"),
     SP(CT_C, "dynamic_list/init_and_clear.c"),
@@ -127,15 +57,18 @@ struct CompileData target_kollektions_files[] = {
     SP(CT_C, "dynamic_list/removeAt_and_removeRange.c"),
     SP(CT_C, "dynamic_list/reserve_and_shrink.c"),
     SP(CT_C, "dynamic_list/anylist_impl.c"),
+};
 
+struct CompileData fixed_list_files[] = {
+    DIR("build/"),
     DIR("build/fixed_list/"),
     SP(CT_C, "fixed_list/get_and_set.c"),
     SP(CT_C, "fixed_list/indexOf.c"),
     SP(CT_C, "fixed_list/anylist_impl.c"),
+};
 
-    DIR("build/lists/"),
-    SP(CT_C, "lists/copy.c"),
-
+struct CompileData linked_list_files[] = {
+    DIR("build/"),
     DIR("build/linked_list/"),
     SP(CT_C, "linked_list/add.c"),
     SP(CT_C, "linked_list/addAll.c"),
@@ -152,21 +85,88 @@ struct CompileData target_kollektions_files[] = {
     SP(CT_C, "linked_list/anylist_impl.c"),
 };
 
-enum CompileResult target_kollektions() {
-    ONLY_IF({
-        NOT_FILE("build/kollektions.a");
-        CHANGED("linked_list/");
-        CHANGED("lists/");
-        CHANGED("dynamic_list/");
-        CHANGED("fixed_list/");
+struct CompileData filelib_files[] = {
+    DIR("build/"),
+    DIR("build/filelib"),
+    SP(CT_C, "filelib/copy.c"),
+    SP(CT_C, "filelib/readFile.c"),
+    SP(CT_C, "filelib/readLine.c"),
+    SP(CT_C, "filelib/readSplit.c"),
+};
 
-        CHANGED("attrib.h");
-        CHANGED("mutex.h");
-    });
+struct CompileData niglob_files[] = {
+    DIR("build/"),
+    DIR("build/niglob"),
+    SP(CT_C, "niglob/niglob.c"),
+};
 
+struct CompileData tcp_files[] = {
+    DIR("build/"),
+    DIR("build/tcp"),
+    SP(CT_C, "tcp/wintcpclient.c"),
+    SP(CT_C, "tcp/posixtcpclient.c"),
+};
+
+struct CompileData always_recomp_files[] = {
+    DIR("build/lists/"),
+    SP(CT_C, "lists/copy.c"),
+    SP(CT_C, "memlib.c"),
+    SP(CT_C, "miniconf.c"),
+};
+
+enum CompileResult target_all() {
     START;
-        DO(compile(LI(target_kollektions_files)));
-        DO(linkTask(LI(target_kollektions_files), "build/kollektions.a"));
+
+    bool notOut = !exists("build/all.a");
+
+
+    VaList comp = newVaList();
+
+    comp = vaListConcat(comp, ASVAR(always_recomp_files));
+
+    if (notOut || file_changed("germanstr/"))
+        comp = vaListConcat(comp, ASVAR(germanstr_files));
+
+    if (notOut || file_changed("kallok/"))
+        comp = vaListConcat(comp, ASVAR(kallok_files));
+
+    if (notOut || file_changed("kash/"))
+        comp = vaListConcat(comp, ASVAR(kash_files));
+
+    if (notOut || file_changed("dynamic_list/"))
+        comp = vaListConcat(comp, ASVAR(dynamic_list_files));
+
+    if (notOut || file_changed("fixed_list/"))
+        comp = vaListConcat(comp, ASVAR(fixed_list_files));
+
+    if (notOut || file_changed("linked_list/"))
+        comp = vaListConcat(comp, ASVAR(linked_list_files));
+
+    if (notOut || file_changed("filelib/"))
+        comp = vaListConcat(comp, ASVAR(filelib_files));
+
+    if (notOut || file_changed("niglob/"))
+        comp = vaListConcat(comp, ASVAR(niglob_files));
+
+    if (notOut || file_changed("tcp/"))
+        comp = vaListConcat(comp, ASVAR(tcp_files));
+
+    DO(compile(VLI(comp)));
+
+    VaList all = newVaList();
+    all = vaListConcat(all, ASVAR(germanstr_files));
+    all = vaListConcat(all, ASVAR(kallok_files));
+    all = vaListConcat(all, ASVAR(kash_files));
+    all = vaListConcat(all, ASVAR(dynamic_list_files));
+    all = vaListConcat(all, ASVAR(fixed_list_files));
+    all = vaListConcat(all, ASVAR(linked_list_files));
+    all = vaListConcat(all, ASVAR(filelib_files));
+    all = vaListConcat(all, ASVAR(niglob_files));
+    all = vaListConcat(all, ASVAR(tcp_files));
+    all = vaListConcat(all, ASVAR(always_recomp_files));
+
+    DO(linkTask(VLI(all), "build/all.a"));
+
     END;
 }
 
@@ -177,11 +177,7 @@ enum CompileResult target_tests() {
         DIR("build/"),
         DIR("build/tests/"),
 
-        DEP("build/kollektions.a"),
-        DEP("build/kallok.a"),
-        DEP("build/kash.a"),
-        DEP("build/opstr.a"),
-        DEP("build/germanstr.a"),
+        DEP("build/all.a"),
         LDARG("-lm"),
     };
 
@@ -191,17 +187,9 @@ enum CompileResult target_tests() {
 /* ========================================================================= */
 
 struct Target targets[] = {
-	{ .name = "kallok.a",       .run = target_kallok },
-	{ .name = "kollektions.a",  .run = target_kollektions },
-    { .name = "kash.a",         .run = target_kash },
-    { .name = "opstr.a",        .run = target_opstr },
-    { .name = "germanstr.a",    .run = target_germanstr },
-    { .name = "tests",          .run = target_tests },
-    { .name = "clean",          .run = target_clean },
+	{ .name = "all.a", .run = target_all },
+    { .name = "tests", .run = target_tests },
+    { .name = "clean", .run = target_clean },
 };
 
-#define TARGETS_LEN (sizeof(targets) / sizeof(targets[0]))
-
-int main(int argc, char **argv) {
-    return build_main(argc, argv, targets, TARGETS_LEN);
-}
+automain(targets);

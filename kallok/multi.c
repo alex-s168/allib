@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+#if !A_CFG_ALLY_ONLY_LIBC 
+
 static void alloc_free(void *stateIn, void *alloc, size_t old) {
     AllyMultiState *state = stateIn;
 
@@ -56,3 +58,5 @@ Ally createMultiAlloc(AllyMultiState *state, Ally a, Ally b) {
     state->b = b;
     return (Ally) { .impl = &impl, .state = state };
 }
+
+#endif

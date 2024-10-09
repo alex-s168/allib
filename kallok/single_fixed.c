@@ -4,6 +4,8 @@
 
 #include "kallok.h"
 
+#if !A_CFG_ALLY_ONLY_LIBC 
+
 static void alloc_free(void *stateIn, void *alloc, size_t old) {
     (void) old;
     AllySingleFixedState *state = stateIn;
@@ -45,3 +47,5 @@ Ally createSingleFixedAlloc(AllySingleFixedState *state, void *data, size_t len)
     state->len = len;
     return (Ally) { .impl = &impl, .state = state };
 }
+
+#endif

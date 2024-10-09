@@ -13,13 +13,16 @@
 #include <ws2tcpip.h>
 
 struct TcpClient_Con {
+    Ally   ally;
     SOCKET ConnectSocket;
 };
 
+size_t TcpClient_Con_allyOff = offsetof(TcpClient_Con, ally);
 
-TcpClient_Con * TcpClient_open(const char * ip, uint16_t port) {
-    TcpClient_Con * con = malloc(sizeof(TcpClient_Con));
+TcpClient_Con * TcpClient_open(Ally ally, const char * ip, uint16_t port) {
+    TcpClient_Con * con = yalloc(ally, sizeof(TcpClient_Con));
     if (con == NULL) return NULL;
+    con->ally = ally;
 
     con->ConnectSocket = INVALID_SOCKET;
 
@@ -60,7 +63,7 @@ TcpClient_Con * TcpClient_open(const char * ip, uint16_t port) {
         con->ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
         if (con->ConnectSocket == INVALID_SOCKET) {
             WSACleanup();
-            free(con);
+            yfree(con->ally, con, sizeof(struct TcpClient_Con));
             return NULL;;
         }
 
@@ -78,7 +81,7 @@ TcpClient_Con * TcpClient_open(const char * ip, uint16_t port) {
 
     if (con->ConnectSocket == INVALID_SOCKET) {
         WSACleanup();
-        free(con);
+        yfree(con->ally, con, sizeof(struct TcpClient_Con));
         return NULL;
     }
 
@@ -101,14 +104,14 @@ uint8_t * TcpClient_recv(TcpClient_Con * con, size_t * len_out) {
 
     // try read until buf enough 
     do {
+        buf = yrealloc(con->ally, buf, buf_len, buf_len + 256);
         buf_len += 256;
-        buf = realloc(buf, buf_len);
 
         result = recv(con->ConnectSocket, (char*) buf, buf_len, 0);
     } while (result == SOCKET_ERROR && WSAGetLastError() == WSAEMSGSIZE);
 
     if (result == SOCKET_ERROR) {
-        if (buf) free(buf);
+        if (buf) yfree(con->ally, buf, buf_len);
         return NULL;
     }
 
@@ -125,7 +128,7 @@ void TcpClient_close(TcpClient_Con * con) {
     shutdown(con->ConnectSocket, SD_SEND);
     closesocket(con->ConnectSocket);
     WSACleanup();
-    free(con);
+    yfree(con->ally, con, sizeof(struct TcpClient_Con));
 }
 
 #endif 
