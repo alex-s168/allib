@@ -2,3 +2,4 @@ build/
 *.exe
 a.out
 *.o
+build.changed
