@@ -118,7 +118,8 @@ enum CompileResult target_all() {
     START;
 
     bool notOut = !exists("build/all.a");
-
+    if (notOut)
+        puts("recompiling all");
 
     VaList comp = newVaList();
 

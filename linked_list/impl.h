@@ -2,11 +2,11 @@
 
 static struct DoubleLinkedElement *allocElem(DoubleLinkedList *list) {
     return (struct DoubleLinkedElement *)
-        list->ally.impl->alloc(list->ally.state,
+        yalloc(list->ally,
                 sizeof(struct DoubleLinkedElement) + list->elSize);
 }
 
 static void freeElem(DoubleLinkedList *list, struct DoubleLinkedElement * elem) {
-    list->ally.impl->free(list->ally.state, elem,
+    yfree(list->ally, elem,
                           sizeof(struct DoubleLinkedElement) + list->elSize);
 }

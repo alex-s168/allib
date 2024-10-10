@@ -95,6 +95,14 @@ static inline germanstr germanstr_fromc(char * cstr)
     return germanstr_from(strlen(cstr), cstr);
 }
 
+static inline germanstr germanstr_cstrdup(const char * ptr)
+{
+    germanstr res = germanstr_fromc((char*) ptr);
+    if (germanstr_is_long(res))
+        res._long.ptr = strdup(ptr);
+    return res;
+}
+
 static inline void germanstr_libcfree(germanstr str)
 {
     if (germanstr_is_long(str))

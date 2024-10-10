@@ -6,7 +6,7 @@ static void hash_pearson_##bits##_hash(void *dest, void *value, size_t valueSize
     type hash = valueSize % 256; \
     for (size_t i = 0; i < valueSize; i ++) { \
         uint8_t c = ((uint8_t *)value)[i]; \
-        type hashnew; \
+        type hashnew = 0; \
         for (size_t b = 0; b < bytes; b ++)  { \
             hashnew <<= 8; \
             hashnew |= rijndaelSBox[((hash >> (b * 8)) & 0xFF) ^ c]; \
@@ -19,7 +19,7 @@ static void hash_pearson_##bits##_hashstr(void *dest, const char *str) { \
     type hash = 0; \
     while (*str) { \
         uint8_t c = (uint8_t) *str ++; \
-        type hashnew; \
+        type hashnew = 0; \
         for (size_t b = 0; b < bytes; b ++)  { \
             hashnew <<= 8; \
             hashnew |= rijndaelSBox[((hash >> (b * 8)) & 0xFF) ^ c]; \

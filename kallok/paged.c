@@ -6,6 +6,8 @@
 
 #include "kallok.h"
 
+#if !A_CFG_ALLY_ONLY_LIBC 
+
 static void paged_free(void *state, void *alloc, size_t old) {
     (void) state;
 
@@ -46,3 +48,5 @@ static AllyImpl impl = {
 Ally getPageAlloc() {
     return (Ally) { .state = NULL, .impl = &impl };
 }
+
+#endif

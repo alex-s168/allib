@@ -17,6 +17,9 @@ struct Chunk {
 #define CHUNK_SIZE sizeof(struct Chunk)
 
 bool isFixedBasicAllocEmpty(Ally ally) {
+#if A_CFG_ALLY_ONLY_LIBC
+    return false;
+#else 
     AllyFixedBasicState *state = ally.state;
     for (size_t i = 0; i < state->len; i ++) {
         struct Chunk *chunk = &((struct Chunk *) state->start)[i];
@@ -24,6 +27,7 @@ bool isFixedBasicAllocEmpty(Ally ally) {
             return false;
     }
     return true;
+#endif
 }
 
 static void  alloc_fixed_basic_free(void *stateIn, void *alloc, size_t old) {
@@ -94,8 +98,10 @@ AllyImpl alloc_fixed_basic = {
     .realloc = alloc_fixed_basic_realloc,
 };
 
+#if !A_CFG_ALLY_ONLY_LIBC
 Ally createFixedBasicAlloc(AllyFixedBasicState *state, void *data, size_t limit) {
     state->start = state->next = data;
     state->len = limit;
     return (Ally) { .state = state, .impl = &alloc_fixed_basic };
 }
+#endif

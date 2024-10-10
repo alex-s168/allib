@@ -19,6 +19,7 @@ static size_t makeMultiple(size_t x, size_t y) {
     return x;
 }
 
+// also exists when A_CFG_ALLY_ONLY_LIBC for less typedefs needed
 typedef struct {
     // DOES NOT CRASH IF ALLOC NOT ALLOCATED BY ALLOCATOR
     void (*free)(void *state, void *alloc, size_t old);
@@ -27,6 +28,20 @@ typedef struct {
 
     void *(*realloc)(void *state, void *alloc, size_t old, size_t size);
 } AllyImpl;
+
+#if A_CFG_ALLY_ONLY_LIBC
+
+typedef struct {} Ally;
+
+static bool Ally_eq(Ally a, Ally b) {
+    return true;
+}
+
+#define yalloc(a, size)               malloc(size)
+#define yrealloc(a, alloc, old, size) realloc(alloc, size)
+#define yfree(a, alloc, old)          free(alloc)
+
+#else 
 
 typedef struct {
     AllyImpl *impl;
@@ -41,6 +56,8 @@ static bool Ally_eq(Ally a, Ally b) {
 #define yrealloc(a, alloc, old, size) a.impl->realloc(a.state, alloc, old, size)
 #define yfree(a, alloc, old)          a.impl->free(a.state, alloc, old)
 
+#endif
+
 static void *ycopy(Ally a, const void *src, size_t size) {
     void *alloc = yalloc(a, size);
     if (alloc == NULL)
@@ -49,8 +66,23 @@ static void *ycopy(Ally a, const void *src, size_t size) {
     return alloc;
 }
 
+#if A_CFG_ALLY_ONLY_LIBC 
+Ally getLIBCAlloc() {
+    return (Ally) {};
+}
+#else 
 Ally getLIBCAlloc();
+#endif 
 
+#if A_CFG_ALLY_ONLY_LIBC 
+struct AllyStats {};
+Ally getStatAlloc(Ally parent, struct AllyStats *statisticDest) {
+    return getLIBCAlloc();
+}
+#ifdef _INC_STDIO
+void outputStats(struct AllyStats *stats, FILE *dest) {}
+#endif
+#else 
 struct AllyStats {
     size_t allocs;
     size_t frees;
@@ -63,7 +95,14 @@ Ally getStatAlloc(Ally parent, struct AllyStats *statisticDest);
 #ifdef _INC_STDIO
 void outputStats(struct AllyStats *stats, FILE *dest);
 #endif
+#endif
 
+#if A_CFG_ALLY_ONLY_LIBC 
+typedef struct {} AllySingleFixedState;
+Ally createSingleFixedAlloc(AllySingleFixedState *state, void *data, size_t len) {
+    return getLIBCAlloc();
+}
+#else 
 typedef struct {
 INTERNAL
     bool used;
@@ -74,7 +113,14 @@ INTERNAL
 // A simple memory allocator that only allows for one allocation at a time.
 // Uses the given fixed array as memry source.
 Ally createSingleFixedAlloc(AllySingleFixedState *state, void *data, size_t len);
+#endif
 
+#if A_CFG_ALLY_ONLY_LIBC 
+typedef struct {} AllyFixedBasicState;
+Ally createFixedBasicAlloc(AllyFixedBasicState *state, void *data, size_t limit) {
+    return getLIBCAlloc();
+}
+#else 
 typedef struct {
 INTERNAL
     void *start;
@@ -85,8 +131,16 @@ INTERNAL
 // A simple memory allocator that allocates elements in a fixed-length array.
 // Does not have any memory-defragmentation features
 Ally createFixedBasicAlloc(AllyFixedBasicState *state, void *data, size_t limit);
+#endif
+
 bool isFixedBasicAllocEmpty(Ally);
 
+#if A_CFG_ALLY_ONLY_LIBC 
+typedef struct {} AllyMultiState;
+Ally createMultiAlloc(AllyMultiState *state, Ally a, Ally b) {
+    return a;
+}
+#else 
 typedef struct {
 INTERNAL
     Ally a;
@@ -95,11 +149,24 @@ INTERNAL
 
 // allloctor that tries to alloc a first and if fail, alloc b
 Ally createMultiAlloc(AllyMultiState *state, Ally a, Ally b);
+#endif 
 
+#if A_CFG_ALLY_ONLY_LIBC 
+Ally getPageAlloc() {
+    return getLIBCAlloc();
+}
+#else 
 // Allocates full OS pages
 // useful for big lists
 Ally getPageAlloc();
+#endif
 
+#if A_CFG_ALLY_ONLY_LIBC 
+typedef struct {} AllyDynamicBasicState;
+Ally createBasicAlloc(AllyDynamicBasicState *state, bool can_leak) {
+    return getLIBCAlloc();
+}
+#else 
 typedef struct {
 INTERNAL
     AllyFixedBasicState fixed_state;
@@ -119,9 +186,9 @@ INTERNAL
 // Based on \see createFixedBasicAlloc
 // __Arena allocator__
 Ally createBasicAlloc(AllyDynamicBasicState *state, bool can_leak);
+#endif
 
 typedef AllyDynamicBasicState AllyStandardState;
-
 static Ally createStandardAlloc(AllyStandardState *state) {
     return createBasicAlloc(state, false);
 }

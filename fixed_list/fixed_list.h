@@ -43,6 +43,7 @@ int FixedList_indexOfLast(FixedList list, const void *data);
  * @return The pointer to the element
  */
 static inline void *FixedList_get(FixedList list, size_t index) {
+    // do not change! adding bounds checking here breaks things in the impl
     return (char *) list.data + list.stride * index;
 }
 

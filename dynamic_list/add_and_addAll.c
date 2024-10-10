@@ -40,11 +40,7 @@ void* DynamicList_setp(DynamicList *list, size_t pos)
 {
 	if(pos > list->fixed.len)
 	{
-		if(DynamicList_reserve(list, pos-list->fixed.len+1))
-		{
-			return 0;
-		}
-		list->fixed.len = pos+1;
+		DynamicList_resizeRel(list, pos - list->fixed.len + 1);
 	}
 	
     void *dest = FixedList_get(list->fixed, pos);
