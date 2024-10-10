@@ -165,7 +165,7 @@ int uthread_join(
         uthread_t * th,
         void ** ret_out)
 {
-    return pthread_exit(th->impl, ret_out);
+    return pthread_join(th->impl, ret_out);
 }
 
 void uthread_kill(
