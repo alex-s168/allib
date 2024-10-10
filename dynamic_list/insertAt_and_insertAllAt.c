@@ -10,9 +10,8 @@
 int DynamicList_insertAllAt(DynamicList *list, size_t index,
                             const void *data, size_t len, size_t stride) {
 
-    if (DynamicList_reserve(list, len))
-        return 1;
-    
+    DynamicList_resizeRel(list, len);
+
     void *elem = FixedList_get(list->fixed, index);
     {
         void *src = elem;

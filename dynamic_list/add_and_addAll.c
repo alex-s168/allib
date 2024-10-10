@@ -10,12 +10,12 @@
 int DynamicList_add(DynamicList *list, const void *data) 
 {
     void* dest = DynamicList_addp(list);
-	
+
 	if(!dest)
 	{
 		return 1;
 	}
-	
+
     memcpy(dest, data, list->fixed.stride);
 	
     return 0;
@@ -27,13 +27,8 @@ int DynamicList_add(DynamicList *list, const void *data)
  */
 void* DynamicList_addp(DynamicList *list)
 {
-    if (DynamicList_reserve(list, 1))
-        return 0;
-
-    void *dest = FixedList_get(list->fixed, list->fixed.len);
-
-    list->fixed.len ++;
-
+    DynamicList_resizeRel(list, 1);
+    void *dest = FixedList_get(list->fixed, list->fixed.len - 1);
     return dest;
 }
 
@@ -78,13 +73,8 @@ int DynamicList_set(DynamicList *list, size_t pos, const void *data) {
  * @return non 0 if ok
  */
 void* DynamicList_addAllp(DynamicList *list, size_t len) {
-    if (DynamicList_reserve(list, len))
-        return NULL;
-
-    void *dest = FixedList_get(list->fixed, list->fixed.len);
-
-    list->fixed.len += len;
-
+    DynamicList_resizeRel(list, len);
+    void *dest = FixedList_get(list->fixed, list->fixed.len - len);
     return dest;
 }
 
