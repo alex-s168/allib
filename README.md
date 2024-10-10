@@ -6,8 +6,8 @@ Really useful C libraries, some of which are header-only.
 To build these libraries, you need to first compile the independent `build.c` file.
 (The project uses [Build.C](https://github.com/alex-s168/build.c))
 But first you should configure some options that can be found in the top of the `build.c` file.
-Then run: `./build.exe list` to list all available tasks.
-(The output static-libraries will be located in the `build/` directory)
+Then run: `./build.exe` to list all available tasks.
+(The output static-library (`lib.a`) be located in the `build/` directory)
 
 You can use TCC to compile on Windows. Define `AR` to `tcc -ar` to do that.
 Example: `tcc -DAR="\"tcc -ar\"" build.c -o build.exe`
@@ -23,8 +23,19 @@ it is recommended to copy the CFLAGS you use for building build.c into the CC_AR
   dynamically-allocated mutable list.
 - Doubly Linked List:
   dynamically-allocated mutable list with O(1) remove, add and insert
-- Any List
+- Any List & Mutable Any List
   virtual interface for all lists
+
+## germanstr
+- Fast C strings for modern processors 
+- Strings shorter than 12 bytes on 64 bit machines can be stored on the stack 
+
+## TCP client 
+- Cross-platform simple TCP client
+
+## niglob 
+- glob() but with way more features 
+- Cross-platform
 
 ## Kallok
 - Common interface for all allocators. `Ally` type.
@@ -158,5 +169,16 @@ int main(void) {
 - `ll_to_ascii`
 - `d_to_ascii`
 
-## smallstr
-Fast vectorized string library compatible with C strings.
+## filelib 
+- easy-to-use functions to read lines or the whole stream into memory
+- functions for copying streams 
+- works on physical- as well as virtual files
+
+## memlib 
+- fast (benefit from vectorization) strided memcopy
+
+## mutex.h 
+- Cross-platform mutex 
+
+## uthread.h 
+- Cross-platform threads library (WIN32 threads on Windows and otherwise pthreads)
