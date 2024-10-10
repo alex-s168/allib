@@ -1,20 +1,21 @@
 # Minilibs & Kollektions & Kallok & Smallstr
-Really useful C libraries, some of which are header-only.
+Really useful cross-platform C libraries.
 
 (Tested on Linux and Windows)
 
 To build these libraries, you need to first compile the independent `build.c` file.
-(The project uses [Build.C](https://github.com/alex-s168/build.c))
+(The project uses [build.c](https://github.com/alex-s168/build.c))
 But first you should configure some options that can be found in the top of the `build.c` file.
+Additional options that can be overwritten can be fond in the `build_c/build.h` files.
 Then run: `./build.exe` to list all available tasks.
 (The output static-library (`lib.a`) be located in the `build/` directory)
 
-You can use TCC to compile on Windows. Define `AR` to `tcc -ar` to do that.
-Example: `tcc -DAR="\"tcc -ar\"" build.c -o build.exe`
+You can use TCC to compile on Windows. Define `AR` to `tcc -ar` and `CC` to `tcc` to do that.
+Example: `tcc -DAR="\"tcc -ar\"" -DCC="\"tcc\"" build.c -o build.exe`
 
 Some components might use preprocessor macros like `__AVX512BW__` to compile a different set of source files,
 so make sure to always compile build.c for the correct target.
-it is recommended to copy the CFLAGS you use for building build.c into the CC_ARGS macro.
+it is recommended to copy the CFLAGS you use for building build.c into the `CC_ARGS` macro.
 
 ## Kollektions
 - Fixed List:
@@ -35,6 +36,7 @@ it is recommended to copy the CFLAGS you use for building build.c into the CC_AR
 
 ## niglob 
 - glob() but with way more features 
+- pattern matching works on string lists too
 - Cross-platform
 
 ## Kallok
@@ -47,12 +49,13 @@ it is recommended to copy the CFLAGS you use for building build.c into the CC_AR
   virtual maps a file into memory.
 
 ## Kash
-- fnv1a
+- hash functions: fnv1a, pearson
+- rijndael sbox
 
 ## miniproc
 Simple child process pipe IO library for C.
+Warning: this library is currently a bit broken!!
 
-### Example
 ```c++
 ChildProc proc = cpopen("/bin/echo", (const char *[]) { "Hi", NULL });
 if (proc.from == NULL) {
@@ -70,7 +73,6 @@ cpclose(proc);
 ## minitab
 Simple string table printing library for C.
 
-### Example
 ```c++
 int main() {
     Table table;
@@ -96,7 +98,6 @@ int main() {
 ## miniconf
 Simple configuration file parser for C.
 
-### Example
 ```c++
 int main() {
     Config cfg;
@@ -136,10 +137,10 @@ status bar:
 ## minifmt
 Simple string templating library for C.
 
-### Dependencies
-- math.h: pow
+also provides:
+- `ll_to_ascii`
+- `d_to_ascii`
 
-### Example
 ```c++
 static const char *fmt_str = "Test {row} str {col.h}";
 
@@ -165,10 +166,6 @@ int main(void) {
 }
 ```
 
-### Additional features
-- `ll_to_ascii`
-- `d_to_ascii`
-
 ## filelib 
 - easy-to-use functions to read lines or the whole stream into memory
 - functions for copying streams 
@@ -176,6 +173,31 @@ int main(void) {
 
 ## memlib 
 - fast (benefit from vectorization) strided memcopy
+- "strided memcopy" meaning copying between two arrays of different strides but same element sizes.
+  this is useful for many things like gather & scatter with offsets and others.
+
+```c++ 
+typedef struct {
+    float a;
+    float b; 
+} MyData;
+
+void loadAs(MyData* dest, float * a, size_t count) {
+    char* d = ((char*)dest) + offsetof(MyData, a);
+    strided_memcpy(d, sizeof(MyData), 
+                   a, sizeof(float),
+                   count,
+                   sizeof(float));
+}
+
+void loadBs(MyData* dest, float * b, size_t count) {
+    char* d = ((char*)dest) + offsetof(MyData, b);
+    strided_memcpy(d, sizeof(MyData), 
+                   b, sizeof(float),
+                   count,
+                   sizeof(float));
+}
+```
 
 ## mutex.h 
 - Cross-platform mutex 
