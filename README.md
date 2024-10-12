@@ -138,6 +138,8 @@ status bar:
 Simple string templating library for C.
 
 also provides:
+- `ascii_to_ll`
+- `ascii_to_d`
 - `ll_to_ascii`
 - `d_to_ascii`
 

@@ -632,8 +632,10 @@ static void niglob_int(niglob_res * res, const char * pattern, const char * work
 }
 
 niglob_res niglob(const char * pattern, const char * working_dir) {
-    if (pattern == NULL)
-        perror("\"niglob\" function parameter \"pattern\" can not be NULL!");
+    if (pattern == NULL) {
+        fprintf(stderr, "\"niglob\" function parameter \"pattern\" can not be NULL!");
+        exit(1);
+    }
 
     niglob_res res;
     res.items = NULL;

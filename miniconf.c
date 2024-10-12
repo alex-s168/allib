@@ -1,4 +1,5 @@
 #include "miniconf.h"
+#include "minifmt.h"
 
 void config_child(Config *dest,
                   const Config cfg,
@@ -163,9 +164,8 @@ long config_get_long(const Config cfg, bool *ok)
         val ++;
     }
 
-    char *end;
-    const long value = strtol(val, &end, base);
-    *ok = (*end == '\0');
+    const long value = ascii_to_ll(val, strlen(val), base);
+    *ok = true;
     return value;
 }
 
@@ -177,9 +177,8 @@ double config_get_double(const Config cfg, bool *ok)
         return 0.0;
     }
 
-    char *end;
-    const double value = strtod(val, &end);
-    *ok = (*end == '\0');
+    const double value = ascii_to_d(val, strlen(val), 10);
+    *ok = true; 
     return value;
 }
 

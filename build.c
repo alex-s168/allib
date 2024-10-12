@@ -112,6 +112,7 @@ struct CompileData always_recomp_files[] = {
     SP(CT_C, "lists/copy.c"),
     SP(CT_C, "memlib.c"),
     SP(CT_C, "miniconf.c"),
+    SP(CT_C, "minifmt.c"),
 };
 
 enum CompileResult target_all() {
