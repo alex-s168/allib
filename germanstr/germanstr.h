@@ -52,11 +52,13 @@ static inline char germanstr_at(germanstr str, uint32_t idx)
 
 static inline void germanstr_set(germanstr* str, uint32_t idx, char value)
 {
-#if __has_builtin(__builtin_expect)
-    if (__builtin_expect(germanstr_is_long(*str), false))
-#else 
     if (germanstr_is_long(*str))
-#endif 
+#ifndef __TINYC__ 
+#if __has_builtin(__builtin_expect)
+    {}
+    if (__builtin_expect(germanstr_is_long(*str), false))
+#endif
+#endif
     {
         if (idx < 4)
         {

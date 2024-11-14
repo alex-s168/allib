@@ -2,4 +2,4 @@ build/
 *.exe
 a.out
 *.o
-build.changed
+build.slowdb

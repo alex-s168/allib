@@ -6,6 +6,10 @@
 #define MALLOC_ALIGNMENT (8)
 #define OPT_STRIDED_MEMCPY_MAX_STRIDE (128) // should be multiple of target vlen
 
+#ifdef __TINYC__ 
+#define __builtin_unreachable() /**/
+#endif 
+
 static void strided_memcpy_same_stride(char* dest,
                                        const char *src,
                                        size_t numEl,

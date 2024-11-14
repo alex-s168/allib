@@ -8,6 +8,10 @@
 # define CXX_ARGS  "-O3"
 #endif
 
+#ifndef HAVE_WINSOCK
+# define HAVE_WINSOCK 1 
+#endif
+
 #include "build_c/build.h"
 
 /* ========================================================================= */
@@ -101,10 +105,12 @@ struct CompileData niglob_files[] = {
 };
 
 struct CompileData tcp_files[] = {
+#if HAVE_WINSOCK
     DIR("build/"),
     DIR("build/tcp"),
     SP(CT_C, "tcp/wintcpclient.c"),
     SP(CT_C, "tcp/posixtcpclient.c"),
+#endif
 };
 
 struct CompileData always_recomp_files[] = {
