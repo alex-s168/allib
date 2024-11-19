@@ -4,7 +4,8 @@
 #define MINIFMT_IMPL
 #include "../minifmt.h"
 
-static char *fmt_str = "Test {row} str 0x{col.h} {test}";
+// can't be const!
+static char fmt_str[] = "Test {row} str 0x{col.h} {test}";
 
 int main() {
     const Fmt fmt = fmt_compile(fmt_str);
