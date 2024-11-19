@@ -188,6 +188,29 @@ INTERNAL
 Ally createBasicAlloc(AllyDynamicBasicState *state, bool can_leak);
 #endif
 
+#if A_CFG_ALLY_ONLY_LIBC
+typedef struct {} AllyFastState;
+Ally createFastAlloc(AllyFastState *state, Ally backing) {
+    return getLIBCAlloc();
+}
+#else
+typedef struct {
+INTERNAL 
+	Ally backing;
+	size_t num_alive_allocs;
+
+	struct { void * ptr; size_t len; } * chunks;
+	size_t chunkslen;
+
+	void * chunk;
+	size_t chunk_left;
+	size_t chunk_len;
+} AllyFastState;
+/** not memory efficient at all! recommended to call [fastAllocFreeAll] afterwards */
+Ally createFastAlloc(AllyFastState *state, Ally backing);
+void fastAllocFreeAll(Ally fastAlloc);
+#endif
+
 typedef AllyDynamicBasicState AllyStandardState;
 static Ally createStandardAlloc(AllyStandardState *state) {
     return createBasicAlloc(state, false);
