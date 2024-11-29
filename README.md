@@ -3,7 +3,24 @@ Really useful cross-platform C libraries.
 
 (Tested on Linux and Windows)
 
-To build these libraries, you need to first compile the independent `build.c` file.
+If you are using the [build.c](https://github.com/alex-s168/build.c) build system,
+you can just add this as git submodule and add a task like this to your build file:
+```c
+enum CompileResult target_deps() {
+    ONLY_IF({
+        CHANGED("allib/");
+        NOT_FILE("allib/build/all.a");
+    });
+    START;
+    ssx("allib/", "-DHAVE_WINSOCK=0", ({
+        ss_task("all.a");
+    }));
+    END;
+}
+```
+If you are making an executable, you also need to add `DEP("allib/build/all.a")` to a compile files list.
+
+Otherwise, you need to first compile the independent `build.c` file.
 (The project uses [build.c](https://github.com/alex-s168/build.c))
 But first you should configure some options that can be found in the top of the `build.c` file.
 Additional options that can be overwritten can be fond in the `build_c/build.h` files.
@@ -27,14 +44,17 @@ it is recommended to copy the CFLAGS you use for building build.c into the `CC_A
 - Any List & Mutable Any List
   virtual interface for all lists
 
+Best practices: annotate generic types with the `TYPES()` macro. Example: `DynamicList TYPES(int)`
+
 ## germanstr
+UmbraDB-like string implementation
 - Fast C strings for modern processors 
 - Strings shorter than 12 bytes on 64 bit machines can be stored on the stack 
 
-## TCP client 
+## TCP client
 - Cross-platform simple TCP client
 
-## niglob 
+## niglob
 - glob() but with way more features 
 - pattern matching works on string lists too
 - Cross-platform
