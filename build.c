@@ -130,7 +130,6 @@ enum CompileResult target_all() {
         puts("recompiling all");
 
     VaList comp = newVaList();
-
     comp = vaListConcat(comp, ASVAR(always_recomp_files));
 
     if (notOut || file_changed("germanstr/"))

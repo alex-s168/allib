@@ -78,7 +78,7 @@ void strided_memcpy(void* dest, size_t dest_stride,
         // other methods are too slow because really sparse data 
 
         for (size_t i = 0; i < numEl; i ++) {
-            memcpy(&dest[dest_stride * i], &src[src_stride * i], elSize);
+            memcpy(&((char*)dest)[dest_stride * i], &((char const*)src)[src_stride * i], elSize);
         }
     }
     else if (dest_stride == src_stride) {
@@ -92,7 +92,7 @@ void strided_memcpy(void* dest, size_t dest_stride,
     else {
         // TODO: implement new variant with scatter & gather 
         for (size_t i = 0; i < numEl; i ++) {
-            memcpy(&dest[dest_stride * i], &src[src_stride * i], elSize);
+            memcpy(&((char*)dest)[dest_stride * i], &((char const*)src)[src_stride * i], elSize);
         }
     }
 
